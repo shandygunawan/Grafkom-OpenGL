@@ -1,8 +1,11 @@
+#include <iostream>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "shader.hpp"
+
+using namespace std;
 
 int main(void)
 {
@@ -100,11 +103,13 @@ int main(void)
     glGenBuffers(1, &vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+    cout << "vertexbuffer: " << vertexbuffer << endl;
 
 	GLuint colorbuffer;
 	glGenBuffers(1, &colorbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
+	cout << "colorbuffer: " << colorbuffer << endl;
 
     // Create and compile our GLSL program from the shaders
     GLuint programID = LoadShaders( "vertexshader.vert", "fragmentshader.frag" );
