@@ -37,6 +37,7 @@ public:
 
 	// Creator
 	void createVerticesFromFile(string filename);
+	void createVerticesFromFiles(vector<string> filenames);
 	
 	// Drawer
 	void drawTriangles();
@@ -44,7 +45,7 @@ public:
 
 	// Other
 	void clearBackground();
-	void printVertices(GLfloat vertices[], int size);
+	void printVertices(vector<GLfloat> vertices, int size);
 };
 
 /* =============================================
@@ -118,19 +119,36 @@ void Drawer::createVBOs(){
 ============================================== */
 void Drawer::createVerticesFromFile(string filename){
 	vector<string> strings = ioController.readFile(filename);
+	vector<string> vertices_string;
+	vector<GLfloat> vertices_float;
+
 
 	for(auto line = strings.begin(); line != strings.end(); line++){
 
-		if(*line != APP_INPUT_SEPARATOR){
-			vector<string> vertices_string = utils.explodeString(*line, ' ');
-	        vector<GLfloat> vertices_float;
-	        for(unsigned int i = 0; i < vertices_string.size(); i++){
+		
+		if(*line == APP_INPUT_SEPARATOR){
+			for(unsigned int i = 0; i < vertices_string.size(); i++){
 	        	vertices_float.push_back(stof(vertices_string.at(i)));
 	        }
 
-	        vertices_buffer_data.push_back(vertices_float);	
+			vertices_buffer_data.push_back(vertices_float);
+			vertices_string.clear();
+			vertices_float.clear();
+		}
+		else {
+			vector<string> vertices_line = utils.explodeString(*line, ' ');
+
+			for(unsigned int i = 0; i < vertices_line.size(); i++){
+				vertices_string.push_back(vertices_line.at(i));
+			}
 		}
     }
+}
+
+void Drawer::createVerticesFromFile(vector<string> filenames){
+	for(unsigned int i = 0; i < filenames.size(); i++){
+		createVerticesFromFile(filenames.at(i));
+	}
 }
 
 
@@ -158,6 +176,8 @@ void Drawer::drawImages(){
 		total_vertices_count += ((vertices_buffer_data.at(i).size())/3);
 	}
 
+	// cout << "total vertices count: " << total_vertices_count << endl;
+
 	glDrawArrays(GL_TRIANGLES, 0, total_vertices_count); // 5 triangles : 5*3 vertices
 		
 	for(unsigned int i = 0; i < vbos.size(); i++){
@@ -174,7 +194,7 @@ void Drawer::clearBackground(){
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 }
 
-void Drawer::printVertices(GLfloat vertices[], int size){
+void Drawer::printVertices(vector<GLfloat> vertices, int size){
 
 	for(int i = 0; i < size ; i++){
 		
