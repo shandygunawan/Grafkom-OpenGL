@@ -106,7 +106,17 @@ int AppController::init(){
 	// Create VBO
 	drawer.createVBOs();
 
-	vector<GLuint> vbos = drawer.getVBOs();
+	vector<GLuint> vbo = drawer.getVerticesVBOs();
+	for(unsigned int i = 0; i < vbo.size(); i++){
+		cout << "VBO : " << i << endl;
+		cout << "Value : " << vbo.at(i) << endl;	
+	}
+	cout << "============" << endl;
+	vbo = drawer.getColorVBOs();
+	for(unsigned int i = 0; i < vbo.size(); i++){
+		cout << "VBO : " << i << endl;
+		cout << "Value : " << vbo.at(i) << endl;	
+	}
 
 	// Create and compile our GLSL program from the shaders
     shaderID = LoadShaders( "vertexshader.vert", "fragmentshader.frag" );

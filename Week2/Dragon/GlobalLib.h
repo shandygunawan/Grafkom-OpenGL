@@ -16,7 +16,6 @@ struct RGB {
 #define APP_NAME "Dragon"
 #define APP_WIDTH 1280
 #define APP_HEIGHT 960
-#define APP_INPUT_TEXT "dragon.txt"
 #define APP_INPUT_SEPARATOR "====="
 
 #endif

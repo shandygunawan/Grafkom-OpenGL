@@ -6,24 +6,31 @@
 
 class Image {
 private:
-	vector<string> filenames;
+	vector<string> vertices;
+	vector<string> colors;
 
 public:
 	Image();
 
-	vector<string> getFilenames();
-
+	vector<string> getVertices();
+	vector<string> getColors();
 };
 
 Image::Image(){
-	filenames.push_back("kuadran1.txt");
-	// filenames.push_back("kuadran2.txt");
-	// filenames.push_back("kuadran3.txt");
-	// filenames.push_back("kuadran4.txt");
+	vertices.push_back("kuadran1_vertices.txt");
+	// vertices.push_back("kuadran2_vertices.txt");
+	// vertices.push_back("kuadran3_vertices.txt");
+	// vertices.push_back("kuadran4_vertices.txt");
+
+	colors.push_back("kuadran1_color.txt");
 }
 
-vector<string> Image::getFilenames(){
-	return filenames;
+vector<string> Image::getVertices(){
+	return vertices;
+}
+
+vector<string> Image::getColors(){
+	return colors;
 }
 
 #endif
