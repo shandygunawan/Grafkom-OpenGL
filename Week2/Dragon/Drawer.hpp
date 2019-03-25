@@ -106,8 +106,8 @@ void Drawer::createVBOs(){
     GLfloat *vertices_vbo_temp = vertices_buffer_data.data();
     GLfloat vertices_vbo_data[vertices_buffer_data.size()];
 
-    float widthMultiplier = ((float)APP_HEIGHT / (float)APP_WIDTH) * ((float)GRID_SIZE / (float)APP_WIDTH);
-	float heightMultiplier = ((float)APP_WIDTH / (float)APP_HEIGHT) * ((float)GRID_SIZE / (float)APP_HEIGHT);
+    float widthMultiplier = (float)GRID_SIZE / (float)APP_WIDTH;
+	float heightMultiplier = ((float)APP_WIDTH / (float)APP_HEIGHT) * widthMultiplier;
 	float depthMultiplier = 1.0f; // Gak yakin harusnya berapa
 
     for(unsigned int j = 0; j < vertices_buffer_data.size(); j+=3){
