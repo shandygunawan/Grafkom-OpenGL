@@ -16,10 +16,10 @@ using namespace std;
 class Drawer{
 private:
 	RGB color_background;
-	vector<vector<GLfloat>> vertices_buffer_data;
-	vector<vector<GLfloat>> color_buffer_data;
-	vector<GLuint> vertices_vbos;
-	vector<GLuint> color_vbos;
+	GLuint vertices_vbo;
+	GLuint color_vbo;
+	vector<GLfloat> vertices_buffer_data;
+	vector<GLfloat> color_buffer_data;
 	IOController ioController;
 	Utils utils;
 	Image image;
@@ -31,8 +31,8 @@ public:
 
 	// Getter
 	RGB getColorBackground();
-	vector<GLuint> getVerticesVBOs();
-	vector<GLuint> getColorVBOs();
+	GLuint getVerticesVBO();
+	GLuint getColorVBO();
 
 	// Setter
 	void setColorBackground(RGB color);
@@ -41,8 +41,8 @@ public:
 	void createVBOs();
 
 	// Creator
-	vector<GLfloat> createVerticesFromFile(string filename);
-	vector<vector<GLfloat>> createVerticesFromFiles(vector<string> filenames);
+	vector<GLfloat> createBufferDataFromFiles(vector<string> filenames);
+	// vector<GLfloat> createColorFromFiles(vector<string> filenames);
 	
 	// Drawer
 	void drawTriangles();
@@ -62,12 +62,8 @@ Drawer::Drawer(){
 }
 
 Drawer::~Drawer(){
-	for(unsigned int i = 0; i < vertices_vbos.size(); i++){
-		glDeleteBuffers(1, &vertices_vbos.at(i));
-	}
-	for(unsigned int i = 0; i < color_vbos.size(); i++){
-		glDeleteBuffers(1, &color_vbos.at(i));
-	}
+	glDeleteBuffers(1, &vertices_vbo);
+	glDeleteBuffers(1, &color_vbo);
 }
 
 /* =============================================
@@ -77,12 +73,12 @@ RGB Drawer::getColorBackground(){
 	return color_background;
 }
 
-vector<GLuint> Drawer::getVerticesVBOs(){
-	return vertices_vbos;
+GLuint Drawer::getVerticesVBO(){
+	return vertices_vbo;
 }
 
-vector<GLuint> Drawer::getColorVBOs(){
-	return color_vbos;
+GLuint Drawer::getColorVBO(){
+	return color_vbo;
 }
 
 /* =============================================
@@ -100,137 +96,129 @@ void Drawer::setColorBackground(RGB color){
 					  VBO
 ============================================== */
 void Drawer::createVBOs(){
-	vertices_buffer_data = createVerticesFromFiles(image.getVertices());
-	color_buffer_data = createVerticesFromFiles(image.getColors());
+	vertices_buffer_data = createBufferDataFromFiles(image.getVertices());
+	color_buffer_data = createBufferDataFromFiles(image.getColors());
 
-	for(unsigned int i = 0; i < vertices_buffer_data.size(); i++){
-		GLuint vbo;
-		glGenBuffers(1, &vbo);
-	    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	    GLfloat *temp = vertices_buffer_data.at(i).data();
-	    GLfloat data[vertices_buffer_data.at(i).size()];
+	
+	// Create VBO for vertices
+	glGenBuffers(1, &vertices_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vertices_vbo);
+    GLfloat *vertices_vbo_temp = vertices_buffer_data.data();
+    GLfloat vertices_vbo_data[vertices_buffer_data.size()];
 
-		float widthMultiplier = ((float)APP_HEIGHT / (float)APP_WIDTH) * ((float)GRID_SIZE / (float)APP_WIDTH);
-		float heightMultiplier = ((float)APP_WIDTH / (float)APP_HEIGHT) * ((float)GRID_SIZE / (float)APP_HEIGHT);
-		float depthMultiplier = 1.0f; // Gak yakin harusnya berapa
+    float widthMultiplier = ((float)APP_HEIGHT / (float)APP_WIDTH) * ((float)GRID_SIZE / (float)APP_WIDTH);
+	float heightMultiplier = ((float)APP_WIDTH / (float)APP_HEIGHT) * ((float)GRID_SIZE / (float)APP_HEIGHT);
+	float depthMultiplier = 1.0f; // Gak yakin harusnya berapa
 
-	    for(unsigned int j = 0; j < vertices_buffer_data.at(i).size(); j+=3){
-			float widthValue = temp[j+0] * widthMultiplier;
-			float heightValue = temp[j+1] * heightMultiplier;
-			float depthValue = temp[j+2] * depthMultiplier;
+    for(unsigned int j = 0; j < vertices_buffer_data.size(); j+=3){
+		float widthValue = vertices_vbo_temp[j+0] * widthMultiplier;
+		float heightValue = vertices_vbo_temp[j+1] * heightMultiplier;
+		float depthValue = vertices_vbo_temp[j+2] * depthMultiplier;
 
-			cout << widthValue << " " << heightValue << " " << depthValue << endl;
+		// cout << widthValue << " " << heightValue << " " << depthValue << endl;
 
-			data[j] = widthValue;
-			data[j+1] = heightValue;
-			data[j+2] = depthValue;
-	    }
-	    
-	    glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
+		vertices_vbo_data[j] = widthValue;
+		vertices_vbo_data[j+1] = heightValue;
+		vertices_vbo_data[j+2] = depthValue;
+    }
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_vbo_data), vertices_vbo_data, GL_STATIC_DRAW);
 
-	    vertices_vbos.push_back(vbo);
+
+	// Create VBO for color
+	glGenBuffers(1, &color_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, color_vbo);
+    GLfloat *color_vbo_temp = color_buffer_data.data();
+    GLfloat color_vbo_data[color_buffer_data.size()];
+
+    for(unsigned int j = 0; j < color_buffer_data.size(); j++){
+    	color_vbo_data[j] = color_vbo_temp[j];
 	}
-
-	for(unsigned int i = 0; i < color_buffer_data.size(); i++){
-		GLuint vbo;
-		glGenBuffers(1, &vbo);
-	    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	    GLfloat *temp = color_buffer_data.at(i).data();
-	    GLfloat data[color_buffer_data.at(i).size()];
-
-	    for(unsigned int j = 0; j < color_buffer_data.at(i).size(); j++){
-	    	data[j] = temp[j];
-	    }
-	    
-	    glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
-
-	    color_vbos.push_back(vbo);
-	}
+	glBufferData(GL_ARRAY_BUFFER, sizeof(color_vbo_data), color_vbo_data, GL_STATIC_DRAW);
 }
 
 /* =============================================
 					Creator
 ============================================== */
-vector<GLfloat> Drawer::createVerticesFromFile(string filename){
+vector<GLfloat> Drawer::createBufferDataFromFiles(vector<string> filenames){
 	vector<GLfloat> toReturn;
-	vector<string> strings = ioController.readFile(filename);
 	vector<string> vertices_string;
 	vector<GLfloat> vertices_float;
 
-	for(auto line = strings.begin(); line != strings.end(); line++){
-		if(*line == APP_INPUT_SEPARATOR){
-			for(unsigned int i = 0; i < vertices_string.size(); i++){
-	        	toReturn.push_back(stof(vertices_string.at(i)));
-	        }
+	for(auto filename = filenames.begin(); filename != filenames.end(); filename++){
+		vector<string> strings = ioController.readFile(*filename);
+		
+		for(auto line = strings.begin(); line != strings.end(); line++){
+			if(*line == APP_INPUT_SEPARATOR){
+				for(unsigned int i = 0; i < vertices_string.size(); i++){
+		        	toReturn.push_back(stof(vertices_string.at(i)));
+		        }
 
-			vertices_buffer_data.push_back(vertices_float);
-			vertices_string.clear();
-			vertices_float.clear();
-		}
-		else {
-			vector<string> vertices_line = utils.explodeString(*line, ' ');
-
-			for(unsigned int i = 0; i < vertices_line.size(); i++){
-				vertices_string.push_back(vertices_line.at(i));
+				vertices_string.clear();
+				vertices_float.clear();
 			}
-		}
-    }
+			else {
+				vector<string> vertices_line = utils.explodeString(*line, ' ');
+
+				for(unsigned int i = 0; i < vertices_line.size(); i++){
+					vertices_string.push_back(vertices_line.at(i));
+				}
+			}
+	    }
+	}
 
     return toReturn;
 }
 
-vector<vector<GLfloat>> Drawer::createVerticesFromFiles(vector<string> filenames){
-	vector<vector<GLfloat>> toReturn;
+/*
+vector<GLfloat> Drawer::createColorFromFiles(vector<string> filenames){
+	vector<GLfloat> toReturn;
+
 	for(unsigned int i = 0; i < filenames.size(); i++){
-		toReturn.push_back(createVerticesFromFile(filenames.at(i)));
+		vector<string> file_strings = ioController.readFile(filenames.at(i));
+
+		for(auto line = file_strings.begin(); line != file_strings.end(); line++){
+			vector<string> color_line = utils.explodeString(*line, ' ');
+
+			for(unsigned int j = 0; j < color_line.size(); j++){
+				toReturn.push_back(stof(color_line.at(j)));
+			}
+	    }
 	}
 
 	return toReturn;
 }
-
+*/
 
 /* =============================================
-					Creator
+					DRAW
 ============================================== */
 void Drawer::drawImages(){
-	// Draw shapes
-	for(unsigned int i = 0; i < vertices_vbos.size()-1; i++){
-        glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, vertices_vbos.at(i));
-        glVertexAttribPointer(
-			0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-			3,                  // size
-			GL_FLOAT,           // type
-			GL_FALSE,           // normalized?
-			0,                  // stride
-			(void*)0            // array buffer offset
-        );
-	}
-
 	
-	glEnableVertexAttribArray(1);
-	for(unsigned int i = 0; i < color_vbos.size(); i++){
-        glBindBuffer(GL_ARRAY_BUFFER, color_vbos.at(i));
-        glVertexAttribPointer(
-			1,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-			3,                  // size
-			GL_FLOAT,           // type
-			GL_FALSE,           // normalized?
-			0,                  // stride
-			(void*)0            // array buffer offset
-        );
-	}
-	
+	// Draw vertices
+	glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, vertices_vbo);
+    glVertexAttribPointer(
+		0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+		3,                  // size
+		GL_FLOAT,           // type
+		GL_FALSE,           // normalized?
+		0,                  // stride
+		(void*)0            // array buffer offset
+    );
 
-	int total_vertices_count = 0;
+    glEnableVertexAttribArray(1);
+	// printVertices(color_buffer_data, color_buffer_data.size());
+	glBindBuffer(GL_ARRAY_BUFFER, color_vbo);
+    glVertexAttribPointer(
+		1,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+		3,                  // size
+		GL_FLOAT,           // type
+		GL_FALSE,           // normalized?
+		0,                  // stride
+		(void*)0            // array buffer offset
+    );
 
-	for(unsigned int i = 0; i < vertices_buffer_data.size(); i++){
-		total_vertices_count += ((vertices_buffer_data.at(i).size())/3);
-	}
-
-	for(unsigned int i = 0; i < color_buffer_data.size(); i++){
-		total_vertices_count += ((color_buffer_data.at(i).size())/3);
-	}
+	int total_vertices_count = ((vertices_buffer_data.size() + color_buffer_data.size())/3);
 
 	// cout << "total vertices count: " << total_vertices_count << endl;
 
