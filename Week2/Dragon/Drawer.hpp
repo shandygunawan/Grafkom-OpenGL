@@ -9,6 +9,7 @@
 #include "GlobalLib.h"
 #include "IOController.hpp"
 #include "Utils.hpp"
+#include "Image.hpp"
 
 using namespace std;
 
@@ -19,6 +20,7 @@ private:
 	vector<GLuint> vbos;
 	IOController ioController;
 	Utils utils;
+	Image image;
 
 public:
 	// Contructor, Destructor, Copy Constructor
@@ -53,7 +55,7 @@ public:
 ============================================== */
 Drawer::Drawer(){
 	// Set background's color
-	color_background = {0.0f, 0.4f, 0.0f, 0.0f}; // Black
+	color_background = {1.0f, 1.0f, 1.0f, 1.0f}; // White
 }
 
 Drawer::~Drawer(){
@@ -88,7 +90,7 @@ void Drawer::setColorBackground(RGB color){
 					  VBO
 ============================================== */
 void Drawer::createVBOs(){
-	createVerticesFromFile(APP_INPUT_TEXT);
+	createVerticesFromFiles(image.getFilenames());
 
 	for(unsigned int i = 0; i < vertices_buffer_data.size(); i++){
 		/*
