@@ -18,4 +18,6 @@ struct RGB {
 #define APP_HEIGHT 1024
 #define APP_INPUT_SEPARATOR "====="
 
+#define GRID_SIZE 10
+
 #endif

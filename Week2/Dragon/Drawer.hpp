@@ -110,8 +110,20 @@ void Drawer::createVBOs(){
 	    GLfloat *temp = vertices_buffer_data.at(i).data();
 	    GLfloat data[vertices_buffer_data.at(i).size()];
 
-	    for(unsigned int j = 0; j < vertices_buffer_data.at(i).size(); j++){
-	    	data[j] = temp[j];
+		float widthMultiplier = ((float)APP_HEIGHT / (float)APP_WIDTH) * ((float)GRID_SIZE / (float)APP_WIDTH);
+		float heightMultiplier = ((float)APP_WIDTH / (float)APP_HEIGHT) * ((float)GRID_SIZE / (float)APP_HEIGHT);
+		float depthMultiplier = 1.0f; // Gak yakin harusnya berapa
+
+	    for(unsigned int j = 0; j < vertices_buffer_data.at(i).size(); j+=3){
+			float widthValue = temp[j+0] * widthMultiplier;
+			float heightValue = temp[j+1] * heightMultiplier;
+			float depthValue = temp[j+2] * depthMultiplier;
+
+			cout << widthValue << " " << heightValue << " " << depthValue << endl;
+
+			data[j] = widthValue;
+			data[j+1] = heightValue;
+			data[j+2] = depthValue;
 	    }
 	    
 	    glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
