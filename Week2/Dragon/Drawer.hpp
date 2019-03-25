@@ -145,7 +145,7 @@ void Drawer::createVerticesFromFile(string filename){
     }
 }
 
-void Drawer::createVerticesFromFile(vector<string> filenames){
+void Drawer::createVerticesFromFiles(vector<string> filenames){
 	for(unsigned int i = 0; i < filenames.size(); i++){
 		createVerticesFromFile(filenames.at(i));
 	}
