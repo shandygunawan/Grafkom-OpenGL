@@ -14,8 +14,8 @@ struct RGB {
 
 // APP SETTINGS
 #define APP_NAME "Dragon"
-#define APP_WIDTH 1280
-#define APP_HEIGHT 960
+#define APP_WIDTH 1024
+#define APP_HEIGHT 1024
 #define APP_INPUT_SEPARATOR "====="
 
 #endif
