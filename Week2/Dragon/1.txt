@@ -23,3 +23,5 @@
 7 -16 9 -18 ungu_tua
 7 -18 11 -20 ungu_tua
 14 -16 18 -18 ungu_tua
+6 -6 10 -8 cokelat_tua
+8 -8 10 -10 cokelat_tua
