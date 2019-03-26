@@ -13,3 +13,13 @@
 1 -8 8 -12 ungu
 1 -10 12 -12 ungu
 3 -12 14 -16 ungu
+5 -16 18 -18 ungu
+1 -18 14 -20 ungu
+3 -20 7 -22 ungu
+5 -22 7 -24 ungu
+18 -18 20 -20 ungu_tua
+1 -18 5 -20 ungu_tua
+3 -20 5 -22 ungu_tua
+7 -16 9 -18 ungu_tua
+7 -18 11 -20 ungu_tua
+14 -16 18 -18 ungu_tua
