@@ -26,3 +26,12 @@
 14 -16 18 -18 ungu_tua
 6 -6 10 -8 cokelat_tua
 8 -8 10 -10 cokelat_tua
+10 -6 12 -8 cokelat_muda
+10 -4 12 -6 cokelat_tua
+12 -4 14 -6 cokelat_muda
+12 -2 14 -4 cokelat_tua
+14 0 16 -2 cokelat_tua
+16 0 24 -2 cokelat_muda
+12 -6 16 -8 merah_tua
+14 -4 18 -6 merah_tua
+14 -2 22 -4 merah_tua
