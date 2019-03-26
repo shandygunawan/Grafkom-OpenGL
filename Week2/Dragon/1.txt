@@ -1,0 +1,11 @@
+9
+0 -2 1 -4 kuning
+0 -6 1 -8 kuning
+0 -9 1 -12 kuning
+0 -14 3 -16 kuning
+0 -4 1 -6 orange
+0 -8 1 -10 orange
+0 -12 3 -14 orange
+0 -16 5 -18 orange
+14 -14 18 -16 orange
+
