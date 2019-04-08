@@ -155,8 +155,10 @@ vector<GLfloat> Drawer::createBufferDataFromFiles(vector<string> filenames){
 		for(auto line = strings.begin(); line != strings.end(); line++){
 			vector<string> vertices_line = utils.explodeString(*line, ' ');
 
-			for(unsigned int i = 0; i < vertices_line.size(); i++){
-				toReturn.push_back(stof(vertices_line.at(i)));
+			if(vertices_line.at(0) != "#"){
+				for(unsigned int i = 0; i < vertices_line.size(); i++){
+					toReturn.push_back(stof(vertices_line.at(i)));
+				}	
 			}
 	    }
 	}

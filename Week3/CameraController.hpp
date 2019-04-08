@@ -7,7 +7,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "GlobalLib.h"
 
-class InputController {
+class CameraController {
 private:
 	// CAMERA VIEW
 	GLFWwindow* window;
@@ -15,7 +15,7 @@ private:
 	glm::mat4 ProjectionMatrix;
 	GLuint shaderID;
 	GLuint matrixID;  // Get a handle for our "MVP" uniform
-	glm::vec3 position = glm::vec3(1.5, 0, 5); // position
+	glm::vec3 position = glm::vec3(0, 0, 5); // position
 	float horizontalAngle = 3.14f; // Horizontal angle: toward-Z
 	float verticalAngle = 0.0f; // Vertical angle: 0, look at the horizon
 	float initialFoV = 45.0f; // Initial field of view
@@ -27,7 +27,7 @@ private:
 
 public:
 	// Constructor, Destructor, Copy Constructor
-	InputController();
+	CameraController();
 
 	// Setter
 	void setWindow(GLFWwindow* inputWindow);
@@ -48,33 +48,33 @@ public:
 /* =============================================
 	Constructor, Destructor, Copy Constructor
 ============================================== */
-InputController::InputController(){
+CameraController::CameraController(){
 
 }
 
 /* =============================================
 					SETTER
 ============================================== */
-void InputController::setWindow(GLFWwindow* inputWindow){
+void CameraController::setWindow(GLFWwindow* inputWindow){
 	window = inputWindow;
 }
 
-void InputController::setShaderID(GLuint id){
+void CameraController::setShaderID(GLuint id){
 	shaderID = id;
 	setMatrixID();
 }
 
-void InputController::setMatrixID(){
+void CameraController::setMatrixID(){
 	matrixID = glGetUniformLocation(shaderID, "MVP");
 }
 
 /* =============================================
 					GETTER
 ============================================== */
-glm::mat4 InputController::getViewMatrix(){
+glm::mat4 CameraController::getViewMatrix(){
 	return ViewMatrix;
 }
-glm::mat4 InputController::getProjectionMatrix(){
+glm::mat4 CameraController::getProjectionMatrix(){
 	return ProjectionMatrix;
 }
 
@@ -82,7 +82,7 @@ glm::mat4 InputController::getProjectionMatrix(){
 /* =============================================
 				CAMERA CONTROL
 ============================================== */
-void InputController::controlView(){
+void CameraController::controlView(){
 	// Compute the MVP matrix from keyboard and mouse input
 	computeMatricesFromInputs();
 	glm::mat4 ProjectionMatrix = getProjectionMatrix();
@@ -98,7 +98,7 @@ void InputController::controlView(){
 /* =============================================
 					INPUTS HANDLING
 ============================================== */
-void InputController::computeMatricesFromInputs(){
+void CameraController::computeMatricesFromInputs(){
 
 	// glfwGetTime is called only once, the first time this function is called
 	static double lastTime = glfwGetTime();
@@ -154,8 +154,8 @@ void InputController::computeMatricesFromInputs(){
 
 	float FoV = initialFoV;// - 5 * glfwGetMouseWheel(); // Now GLFW 3 requires setting up a callback for this. It's a bit too complicated for this beginner's tutorial, so it's disabled instead.
 
-	// Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
-	ProjectionMatrix = glm::perspective(glm::radians(FoV), 4.0f / 3.0f, 0.1f, 100.0f);
+	// Projection matrix : 45° Field of View, 1:1 ratio, display range : 0.1 unit <-> 100 units
+	ProjectionMatrix = glm::perspective(glm::radians(FoV), 1.0f / 1.0f, 0.1f, 100.0f);
 	// Camera matrix
 	ViewMatrix       = glm::lookAt(
 								position,           // Camera is here
