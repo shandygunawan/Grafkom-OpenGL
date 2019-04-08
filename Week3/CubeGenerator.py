@@ -25,6 +25,9 @@ if __name__ == "__main__":
 	vg = VertexGenerator()
 	cg = RGBGenerator()
 	for line in temp_input:
+		if line.startswith("#"):
+			continue
+			
 		x1, y1, z1, x2, y2, z2, color = [str(x) for x in line.split()]
 
 		cube = vg.createCube(x1, y1, z1, x2, y2, z2)
