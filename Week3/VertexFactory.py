@@ -14,20 +14,14 @@ class VertexFactory():
 		pass
 
 	def __createTriangle(self, p1, p2, p3):
-		temp = []
-
-		temp.append(p1)
-		temp.append(p2)
-		temp.append(p3)
-
-		return "\n".join(map(str, temp))
+		return "\n".join(map(str, [p1, p2, p3]))
 
 	def __createSeparator(self, length):
-		return "#" * length
+		return "# {}".format("=" * length)
 
 	def __createSquare(self, lower_half, upper_half):
-		separator = self.__createSeparator(7)
-		return "\n".join([lower_half, separator, upper_half, separator])
+		separator = self.__createSeparator(3)
+		return "\n{}\n".format(separator).join([lower_half, upper_half])
 
 	def __createSquareWithConstantAxis(self, a1, b1, a2, b2, c):
 		temp = []
@@ -54,7 +48,7 @@ class VertexFactory():
 	def __createSquareAlongYZAxis(self, y1, z1, y2, z2, x):
 		return self.__createSquareWithConstantAxis(y1, z1, y2, z2, x)
 
-	def __createCube(self, x1, y1, z1, x2, y2, z2, color):
+	def __createCube(self, x1, y1, z1, x2, y2, z2):
 		separator = self.__createSeparator(10)
 
 		front = self.__createSquareAlongXYAxis(x1, y1, x2, y2, z1)
@@ -66,10 +60,11 @@ class VertexFactory():
 		left = self.__createSquareAlongYZAxis(y1, z1, y2, z2, x1)
 		right = self.__createSquareAlongYZAxis(y1, z1, y2, z2, x2)
 
-		return "{}\n".format(separator).join([front, back, left, right, top, bottom])
+		return "\n{}\n".format(separator).join([front, back, left, right, top, bottom])
 
 	def createCube(self, x1, y1, z1, x2, y2, z2):
-		return self.__createCube(x1, y1, z1, x2, y2, z2, 'test')
+		return self.__createCube(x1, y1, z1, x2, y2, z2)
 
-sf = VertexFactory()
-print(sf.createCube(0, 3, 0, 4, 0, 3))
+if __name__ == "__main__":
+	sf = VertexFactory()
+	print(sf.createCube(0, 3, 0, 4, 0, 3))
