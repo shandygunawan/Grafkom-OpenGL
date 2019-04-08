@@ -20,8 +20,6 @@ if __name__ == "__main__":
 	with open(input_filename, 'r') as f:
 		temp_input = f.readlines()
 
-	n = len(temp_input)
-
 	vg = VertexGenerator()
 	cg = RGBGenerator()
 	for line in temp_input:
