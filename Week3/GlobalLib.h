@@ -13,7 +13,7 @@ struct RGB {
 };
 
 // APP SETTINGS
-#define APP_NAME "Dragon"
+#define APP_NAME "SUZUKI JIMNY"
 #define APP_WIDTH 1024
 #define APP_HEIGHT 1024
 #define APP_INPUT_SEPARATOR "====="

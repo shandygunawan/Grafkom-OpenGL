@@ -11,7 +11,7 @@
 #include <algorithm>
 #include <sstream>
 #include "GlobalLib.h"
-#include "InputController.hpp"
+#include "CameraController.hpp"
 #include "Drawer.hpp"
 
 using namespace std;
@@ -23,7 +23,7 @@ private:
 	Drawer drawer;
 
 	// CAMERA & INPUT
-	InputController inputController;
+	CameraController cameraController;
 
 	// VAO & SHADER
 	GLuint VertexArrayID; // VAO
@@ -125,8 +125,8 @@ int AppController::init(){
 		return -1;
     }
 
-    inputController.setWindow(window);
-    inputController.setShaderID(shaderID);
+    cameraController.setWindow(window);
+    cameraController.setShaderID(shaderID);
 
 
     return 0;
@@ -153,7 +153,7 @@ void AppController::run(){
         // Use our shader
         glUseProgram(shaderID);
 
-        inputController.controlView();
+        cameraController.controlView();
 
         // Draw Images to screen
         drawer.drawImages();
