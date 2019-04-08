@@ -43,5 +43,6 @@ class ColorFactory():
 		
 		return " ".join(map(str, [red, green, blue]))	
 
-cf = ColorFactory()
-print(cf.getColor(Color.MERAH_TUA))
+if __name__ == "__main__":
+	cf = ColorFactory()
+	print(cf.getColor(Color.MERAH_TUA))
