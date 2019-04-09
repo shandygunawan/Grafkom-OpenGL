@@ -15,7 +15,7 @@ private:
 	glm::mat4 ProjectionMatrix;
 	GLuint shaderID;
 	GLuint matrixID;  // Get a handle for our "MVP" uniform
-	glm::vec3 position = glm::vec3(0, 0, 5); // position
+	glm::vec3 position = glm::vec3(5, 2.5, 5); // position
 	float horizontalAngle = 3.14f; // Horizontal angle: toward-Z
 	float verticalAngle = 0.0f; // Vertical angle: 0, look at the horizon
 	float initialFoV = 45.0f; // Initial field of view
