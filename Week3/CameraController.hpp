@@ -22,7 +22,7 @@ private:
 
 
 	// MOUSE & KEYBOARD
-	float speed = 3.0f; // 3 units / second
+	float speed = 2.0f; // 2 units / second
 	float mouseSpeed = 0.005f;
 
 public:

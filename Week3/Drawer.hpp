@@ -1,6 +1,8 @@
 #ifndef _DRAWER_
 #define _DRAWER_
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -9,44 +11,66 @@
 #include "GlobalLib.h"
 #include "IOController.hpp"
 #include "Utils.hpp"
-#include "Image.hpp"
+#include "Model.hpp"
 
 using namespace std;
 
 class Drawer{
 private:
-	RGB color_background;
+	// VAO & VBO
+	GLuint VAO;
 	GLuint vertices_vbo;
-	GLuint color_vbo;
-	vector<GLfloat> vertices_buffer_data;
-	vector<GLfloat> color_buffer_data;
+	
+	// Shader & Textures
+	GLuint shaderID;
+	GLuint textureID;
+
+	// Controllers
 	IOController ioController;
+
+	// Model
+	Model model;
+	int triangleCount = 0;
+
+	// Others
+	RGB color_background;
 	Utils utils;
-	Image image;
 
 public:
 	// Contructor, Destructor, Copy Constructor
 	Drawer();
-	~Drawer();
+
+	// Destroyer
+	void destroy();
 
 	// Getter
 	RGB getColorBackground();
+	GLuint getVAO();
 	GLuint getVerticesVBO();
-	GLuint getColorVBO();
+	GLuint getTextureID();
+	GLuint getShaderID();
 
 	// Setter
 	void setColorBackground(RGB color);
 
-	// VBO
-	void createVBOs(string type);
+	// Loader
+	void loadModel(Model other);
+	void loadBMP_glfw(char* imagepath);
+	void loadShaders(const char * vertex_file_path,const char * fragment_file_path);
 
-	// Creator
+	// Buffer Data
 	vector<GLfloat> createBufferDataFromFiles(vector<string> filenames);
-	// vector<GLfloat> createColorFromFiles(vector<string> filenames);
-	
+
+	// VAO & VBO
+	void createVAO();
+	void createVBOs();
+	void bindVBOs();
+
+	// Texture
+	void createTexture();
+
 	// Drawer
-	void drawTriangles();
-	void drawImages();
+	void drawModels();
 
 	// Other
 	void clearBackground();
@@ -61,9 +85,15 @@ Drawer::Drawer(){
 	color_background = {0.0f, 0.0f, 0.4f, 0.0f}; // Dark Blue
 }
 
-Drawer::~Drawer(){
+/* =============================================
+					DESTROYER
+============================================== */
+void Drawer::destroy(){
+	
+	// Clean up VAO, VBO, and shader
+	glDeleteProgram(shaderID);
+	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &vertices_vbo);
-	glDeleteBuffers(1, &color_vbo);
 }
 
 /* =============================================
@@ -73,12 +103,20 @@ RGB Drawer::getColorBackground(){
 	return color_background;
 }
 
+GLuint Drawer::getVAO(){
+	return VAO;
+}
+
 GLuint Drawer::getVerticesVBO(){
 	return vertices_vbo;
 }
 
-GLuint Drawer::getColorVBO(){
-	return color_vbo;
+GLuint Drawer::getTextureID(){
+	return textureID;
+}
+
+GLuint Drawer::getShaderID(){
+	return shaderID;
 }
 
 /* =============================================
@@ -93,58 +131,125 @@ void Drawer::setColorBackground(RGB color){
 }
 
 /* =============================================
-					  VBO
+					LOADER
 ============================================== */
-void Drawer::createVBOs(string type){
-	vertices_buffer_data = createBufferDataFromFiles(image.getVertices());
-	color_buffer_data = createBufferDataFromFiles(image.getColors());
+void Drawer::loadModel(Model other){
+	model = other;
+}
 
-	// Create VBO for vertices
-	glGenBuffers(1, &vertices_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vertices_vbo);
-    GLfloat *vertices_vbo_temp = vertices_buffer_data.data();
-    GLfloat vertices_vbo_data[vertices_buffer_data.size()];
+void Drawer::loadBMP_glfw(char* imagepath) {
+    glGenTextures(1, &textureID);
+    
+    glBindTexture(GL_TEXTURE_2D, textureID);
 
-    if(type == "grid"){
-	    float widthMultiplier = (float)GRID_SIZE / (float)APP_WIDTH;
-		float heightMultiplier = ((float)APP_WIDTH / (float)APP_HEIGHT) * widthMultiplier;
-		float depthMultiplier = 1.0f; // Gak yakin harusnya berapa
+    // load and generate the texture
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load(imagepath, &width, &height, &nrChannels, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    stbi_image_free(data);
 
-	    for(unsigned int j = 0; j < vertices_buffer_data.size(); j+=3){
-			float widthValue = vertices_vbo_temp[j+0] * widthMultiplier;
-			float heightValue = vertices_vbo_temp[j+1] * heightMultiplier;
-			float depthValue = vertices_vbo_temp[j+2] * depthMultiplier;
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+}
 
-			// cout << widthValue << " " << heightValue << " " << depthValue << endl;
+void Drawer::loadShaders(const char * vertex_file_path,const char * fragment_file_path){
 
-			vertices_vbo_data[j] = widthValue;
-			vertices_vbo_data[j+1] = heightValue;
-			vertices_vbo_data[j+2] = depthValue;
-	    }
-			
-    }
-    else if(type == "coord"){
-    	for(unsigned int i = 0; i < vertices_buffer_data.size() ; i++){
-	    	vertices_vbo_data[i] = vertices_vbo_temp[i];
-	    }
-    }
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_vbo_data), vertices_vbo_data, GL_STATIC_DRAW);
+	// Create the shaders
+	GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+	GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 
-
-	// Create VBO for color
-	glGenBuffers(1, &color_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, color_vbo);
-    GLfloat *color_vbo_temp = color_buffer_data.data();
-    GLfloat color_vbo_data[color_buffer_data.size()];
-
-    for(unsigned int j = 0; j < color_buffer_data.size(); j++){
-    	color_vbo_data[j] = color_vbo_temp[j];
+	// Read the Vertex Shader code from the file
+	std::string VertexShaderCode;
+	std::ifstream VertexShaderStream(vertex_file_path, std::ios::in);
+	if(VertexShaderStream.is_open()){
+		std::stringstream sstr;
+		sstr << VertexShaderStream.rdbuf();
+		VertexShaderCode = sstr.str();
+		VertexShaderStream.close();
+	}else{
+		printf("Impossible to open %s. Are you in the right directory ? Don't forget to read the FAQ !\n", vertex_file_path);
+		getchar();
 	}
-	glBufferData(GL_ARRAY_BUFFER, sizeof(color_vbo_data), color_vbo_data, GL_STATIC_DRAW);
+
+	// Read the Fragment Shader code from the file
+	std::string FragmentShaderCode;
+	std::ifstream FragmentShaderStream(fragment_file_path, std::ios::in);
+	if(FragmentShaderStream.is_open()){
+		std::stringstream sstr;
+		sstr << FragmentShaderStream.rdbuf();
+		FragmentShaderCode = sstr.str();
+		FragmentShaderStream.close();
+	}
+
+	GLint Result = GL_FALSE;
+	int InfoLogLength;
+
+
+	// Compile Vertex Shader
+	printf("Compiling shader : %s\n", vertex_file_path);
+	char const * VertexSourcePointer = VertexShaderCode.c_str();
+	glShaderSource(VertexShaderID, 1, &VertexSourcePointer , NULL);
+	glCompileShader(VertexShaderID);
+
+	// Check Vertex Shader
+	glGetShaderiv(VertexShaderID, GL_COMPILE_STATUS, &Result);
+	glGetShaderiv(VertexShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+	if ( InfoLogLength > 0 ){
+		std::vector<char> VertexShaderErrorMessage(InfoLogLength+1);
+		glGetShaderInfoLog(VertexShaderID, InfoLogLength, NULL, &VertexShaderErrorMessage[0]);
+		printf("%s\n", &VertexShaderErrorMessage[0]);
+	}
+
+
+
+	// Compile Fragment Shader
+	printf("Compiling shader : %s\n", fragment_file_path);
+	char const * FragmentSourcePointer = FragmentShaderCode.c_str();
+	glShaderSource(FragmentShaderID, 1, &FragmentSourcePointer , NULL);
+	glCompileShader(FragmentShaderID);
+
+	// Check Fragment Shader
+	glGetShaderiv(FragmentShaderID, GL_COMPILE_STATUS, &Result);
+	glGetShaderiv(FragmentShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+	if ( InfoLogLength > 0 ){
+		std::vector<char> FragmentShaderErrorMessage(InfoLogLength+1);
+		glGetShaderInfoLog(FragmentShaderID, InfoLogLength, NULL, &FragmentShaderErrorMessage[0]);
+		printf("%s\n", &FragmentShaderErrorMessage[0]);
+	}
+
+
+
+	// Link the program
+	printf("Linking program\n");
+	GLuint ProgramID = glCreateProgram();
+	glAttachShader(ProgramID, VertexShaderID);
+	glAttachShader(ProgramID, FragmentShaderID);
+	glLinkProgram(ProgramID);
+
+	// Check the program
+	glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
+	glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+	if ( InfoLogLength > 0 ){
+		std::vector<char> ProgramErrorMessage(InfoLogLength+1);
+		glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, &ProgramErrorMessage[0]);
+		printf("%s\n", &ProgramErrorMessage[0]);
+	}
+
+	
+	glDetachShader(ProgramID, VertexShaderID);
+	glDetachShader(ProgramID, FragmentShaderID);
+	
+	glDeleteShader(VertexShaderID);
+	glDeleteShader(FragmentShaderID);
+
+	shaderID = ProgramID;
 }
 
 /* =============================================
-					Creator
+					Buffer Data
 ============================================== */
 vector<GLfloat> Drawer::createBufferDataFromFiles(vector<string> filenames){
 	vector<GLfloat> toReturn;
@@ -155,11 +260,12 @@ vector<GLfloat> Drawer::createBufferDataFromFiles(vector<string> filenames){
 		for(auto line = strings.begin(); line != strings.end(); line++){
 			vector<string> vertices_line = utils.explodeString(*line, ' ');
 
-			if(vertices_line.at(0) != "#"){
+			if(vertices_line.at(0) != "#"){	
 				for(unsigned int i = 0; i < vertices_line.size(); i++){
 					toReturn.push_back(stof(vertices_line.at(i)));
 				}	
 			}
+			
 	    }
 	}
 
@@ -168,31 +274,50 @@ vector<GLfloat> Drawer::createBufferDataFromFiles(vector<string> filenames){
     return toReturn;
 }
 
-/*
-vector<GLfloat> Drawer::createColorFromFiles(vector<string> filenames){
-	vector<GLfloat> toReturn;
-
-	for(unsigned int i = 0; i < filenames.size(); i++){
-		vector<string> file_strings = ioController.readFile(filenames.at(i));
-
-		for(auto line = file_strings.begin(); line != file_strings.end(); line++){
-			vector<string> color_line = utils.explodeString(*line, ' ');
-
-			for(unsigned int j = 0; j < color_line.size(); j++){
-				toReturn.push_back(stof(color_line.at(j)));
-			}
-	    }
-	}
-
-	return toReturn;
-}
-*/
-
 /* =============================================
-					DRAW
+					VAO &  VBO
 ============================================== */
-void Drawer::drawImages(){
-	
+void Drawer::createVAO(){
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+}
+
+void Drawer::createVBOs(){
+	// vertices_buffer_data = createBufferDataFromFiles(model.getVertices());
+
+	// Generate Buffers
+	glGenBuffers(1, &vertices_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vertices_vbo);
+
+    GLfloat vertices_vbo_data[] {
+		0.8f, -0.4f, 1.0f, 0.8f, -0.4f, 0.5f, 0.8f, -0.7f, 0.9f, 0.8f, -0.4f, 0.5f, 0.8f, -0.7f, 0.9f, 0.8f, -0.7f, 0.6f, // Wheel 1
+	    -0.8f, -0.4f, 1.0f, -0.8f, -0.4f, 0.5f, -0.8f, -0.7f, 0.9f, -0.8f, -0.4f, 0.5f, -0.8f, -0.7f, 0.9f, -0.8f, -0.7f, 0.6f, // Wheel 2
+	    0.8f, -0.4f, -1.0f, 0.8f, -0.4f, -0.5f, 0.8f, -0.7f, -0.9f, 0.8f, -0.4f, -0.5f, 0.8f, -0.7f, -0.9f, 0.8f, -0.7f, -0.6f, // Wheel 3
+	    -0.8f, -0.4f, -1.0f, -0.8f, -0.4f, -0.5f, -0.8f, -0.7f, -0.9f, -0.8f, -0.4f, -0.5f, -0.8f, -0.7f, -0.9f, -0.8f, -0.7f, -0.6f, // Wheel 4
+
+	    0.8f,-0.4f,-1.3f, -0.8f,-0.4f,-1.3f, 0.8f, 0.3f, -1.0f, -0.8f,-0.4f,-1.3f, 0.8f, 0.3f, -1.0f, -0.8f, 0.3f, -1.0f, // Lower Back
+	    -0.8f,-0.4f, 1.4f, -0.8f,-0.4f,-1.3f, -0.8f, 0.3f, 1.0f, -0.8f,-0.4f,-1.3f, -0.8f, 0.3f, 1.0f, -0.8f, 0.3f, -1.0f, // Lower Right
+	    0.8f,-0.4f, 1.4f, -0.8f,-0.4f, 1.4f, 0.8f,-0.4f,-1.3f, -0.8f,-0.4f, 1.4f, 0.8f,-0.4f,-1.3f, -0.8f,-0.4f,-1.3f, // Lower Below
+	    -0.8f, 0.3f, 1.0f, 0.8f, 0.3f, 1.0f,  0.8f, 0.3f, -1.0f,  -0.8f, 0.3f, 1.0f,  0.8f, 0.3f, -1.0f,  -0.8f, 0.3f, -1.0f, // Lower Up
+	    0.8f,-0.4f, 1.4f, -0.8f,-0.4f, 1.4f, 0.8f, 0.3f, 1.0f, -0.8f,-0.4f, 1.4f, 0.8f, 0.3f, 1.0f, -0.8f, 0.3f, 1.0f, // Lower Front
+	    0.8f,-0.4f, 1.4f, 0.8f,-0.4f,-1.3f, 0.8f, 0.3f, 1.0f, 0.8f,-0.4f,-1.3f, 0.8f, 0.3f, 1.0f, 0.8f, 0.3f, -1.0f, // Lower Left
+
+	    0.8f, 0.3f,-1.0f, -0.8f, 0.3f,-1.0f, 0.8f, 1.0f, -0.75f, -0.8f, 0.3f,-1.0f, 0.8f, 1.0f, -0.75f,  -0.8f, 1.0f, -0.75f, // Upper Back
+	    -0.8f, 0.3f, 0.5f, -0.8f, 0.3f,-1.0f, -0.8f, 1.0f, 0.3f, -0.8f, 0.3f,-1.0f, -0.8f, 1.0f, 0.3f, -0.8f, 1.0f, -0.75f, // Upper Right
+	    0.8f, 0.3f, 0.5f, -0.8f, 0.3f, 0.5f, 0.8f, 0.3f,-1.0f, -0.8f, 0.3f, 0.5f, 0.8f, 0.3f,-1.0f, -0.8f, 0.3f,-1.0f,  // Upper Below
+	    0.8f, 0.3f, 0.5f, -0.8f, 0.3f, 0.5f, 0.8f, 1.0f, 0.3f, -0.8f, 0.3f, 0.5f, 0.8f, 1.0f, 0.3f, -0.8f, 1.0f, 0.3f, // Upper Front
+	    0.8f, 0.3f, 0.5f, 0.8f, 0.3f,-1.0f, 0.8f, 1.0f, 0.3f, 0.8f, 0.3f,-1.0f, 0.8f, 1.0f, 0.3f, 0.8f, 1.0f, -0.75f, // Upper Left
+	    0.8f, 1.0f, 0.3f, -0.8f, 1.0f, 0.3f, 0.8f, 1.0f, -0.75f, -0.8f, 1.0f, 0.3f, 0.8f, 1.0f, -0.75f, -0.8f, 1.0f, -0.75f // Upper Up
+	};
+	triangleCount += (sizeof(vertices_vbo_data)/sizeof(GLfloat))/3;
+
+    // Bind create buffer data
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_vbo_data), vertices_vbo_data, GL_STATIC_DRAW);
+
+    bindVBOs();
+}
+
+void Drawer::bindVBOs(){
 	// Draw vertices
 	glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, vertices_vbo);
@@ -204,27 +329,53 @@ void Drawer::drawImages(){
 		0,                  // stride
 		(void*)0            // array buffer offset
     );
+}
 
+
+/* =============================================
+					TEXTURE
+============================================== */
+void Drawer::createTexture(){
+	loadBMP_glfw(model.getImage());
+
+	GLfloat texture_data[] {
+	    0.0f, 0.0f, 0.162f, 0.0f, 0.0f, 0.125f, 0.162f, 0.0f, 0.0f, 0.125f, 0.162f, 0.125f, // Wheel 1
+    0.0f, 0.0f, 0.162f, 0.0f, 0.0f, 0.125f, 0.162f, 0.0f, 0.0f, 0.125f, 0.162f, 0.125f, // Wheel 2
+    0.0f, 0.0f, 0.162f, 0.0f, 0.0f, 0.125f, 0.162f, 0.0f, 0.0f, 0.125f, 0.162f, 0.125f, // Wheel 3
+    0.0f, 0.0f, 0.162f, 0.0f, 0.0f, 0.125f, 0.162f, 0.0f, 0.0f, 0.125f, 0.162f, 0.125f, // Wheel 4
+    
+    // Lower Body
+    0.0f, 1.0f-0.0f,        0.363f, 1.0f-0.0f,      0.0f, 1.0f-0.21f,       0.363f, 1.0f,           0.0f, 1.0f-0.21f,   0.363f, 1.0f-0.21f, // Back
+    0.0f, 1.0f-0.505f,      0.73f, 1.0f-0.505f,     0.142f, 1.0f-0.753f,      0.73f, 1.0f-0.505f,     0.142f, 1.0f-0.753f,  0.625f, 1.0f-0.753f, // Rear Right
+    0.751f, 1.0f-0.531f,    1.0f, 1.0f-0.531f,      0.751f, 0.0f,           1.0f, 1.0f-0.531f,      0.751f, 0.0f,       1.0f, 0.0f, // Below
+    0.732f, 1.0f-0.213f,    0.365f, 1.0f-0.213f,    0.365f, 1.0f-0.46f,     0.732f, 1.0f-0.213f,    0.365f, 0.46f,      0.732f, 1.0f-0.46f, // Top
+    0.732f, 1.0f-0.0f,      0.365f, 1.0f,           0.732f, 1.0f-0.213f,    0.365f, 1.0f,           0.732f, 1.0f-0.213f, 0.365f, 1.0f-0.213f, // Front
+    0.0f, 1.0f-0.505f,      0.73f, 1.0f-0.505f,     0.142f, 1.0f-0.753f,      0.73f, 1.0f-0.505f,     0.142f, 1.0f-0.753f,  0.625f, 1.0f-0.753f, // Rear Left
+
+    // // Upper Body
+    0.0f, 1.0f-0.213f,       0.363f, 1.0f-0.213f,     0.0f, 1.0f-0.46f,     0.363f, 1.0f-0.213f, 0.0f, 1.0f-0.46f,    0.363f, 1.0f-0.46f, // Back
+    0.261f, 1.0f-0.755f,     0.73f, 1.0f-0.755f,      0.261f, 0.0f,         0.73f, 1.0f-0.755f,  0.261f, 0.0f,        0.73f, 0.0f, // Rear Right
+    0.751f, 1.0f-0.531f,     1.0f, 1.0f-0.531f,       0.751f, 0.0f,         1.0f, 1.0f-0.531f,   0.751f, 0.0f,        1.0f, 0.0f, // Below
+    0.0f, 1.0f-0.213f,       0.363f, 1.0f-0.213f,     0.0f, 1.0f-0.46f,     0.363f, 1.0f-0.213f, 0.0f, 1.0f-0.46f,    0.363f, 1.0f-0.46f, // Front
+    0.261f, 1.0f-0.755f,     0.73f, 1.0f-0.755f,      0.261f, 0.0f,         0.73f, 1.0f-0.755f,  0.261f, 0.0f,        0.73f, 0.0f, // Rear Left
+    0.76f, 1.0f-0.531f,      1.0f, 1.0f-0.531f,       0.76f, 0.0f,          1.0f, 1.0f-0.531f,   0.76f, 0.0f,         1.0f, 0.0f // Top
+	};
+
+	glGenBuffers(1, &textureID);
+    glBindBuffer(GL_ARRAY_BUFFER, textureID);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(texture_data), texture_data, GL_STATIC_DRAW);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*) 0);
     glEnableVertexAttribArray(1);
-	// printVertices(color_buffer_data, color_buffer_data.size());
-	glBindBuffer(GL_ARRAY_BUFFER, color_vbo);
-    glVertexAttribPointer(
-		1,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-		3,                  // size
-		GL_FLOAT,           // type
-		GL_FALSE,           // normalized?
-		0,                  // stride
-		(void*)0            // array buffer offset
-    );
+}
 
-	int total_vertices_count = ((vertices_buffer_data.size() + color_buffer_data.size())/3);
 
-	// cout << "total vertices count: " << total_vertices_count << endl;
+/* =============================================
+					DRAWER
+============================================== */
+void Drawer::drawModels(){
 
-	glDrawArrays(GL_TRIANGLES, 0, total_vertices_count); // 5 triangles : 5*3 vertices
-		
-	glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
+	glDrawArrays(GL_TRIANGLES, 0, triangleCount);
+
 }
 
 /* =============================================
