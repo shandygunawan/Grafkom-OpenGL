@@ -1,26 +1,28 @@
 ###
 # RODA
 ###
-# Belakang kiri
--1.47	-0.71	0.97	    -1.07	-1.11	0.67        COKELAT_TUA
 # Belakang kanan
--1.47   -0.71   -0.67       -1.07   -1.11   -0.97       COKELAT_TUA
-# Depan kiri
-0.97    -0.71   0.97        1.47    -1.11   0.67        COKELAT_TUA
+-1.47	-0.71	0.97	    -1.07	-1.11	0.67        front back up down left right
+# Belakang kiri
+-1.47   -0.71   -0.67       -1.07   -1.11   -0.97       front back up down left right
 # Depan kanan
-0.97    -0.71   -0.67       1.47    -1.11   -0.97       COKELAT_TUA
+0.97    -0.71   0.97        1.47    -1.11   0.67        front back up down left right
+# Depan kiri
+0.97    -0.71   -0.67       1.47    -1.11   -0.97       front back up down left right
 ###
 # BADAN MOBIL
 ###
 # Part 1
--1.82   -0.86   0.82        -1.52   0.86    -0.82       UNGU
+-1.82   -0.86   0.82        -1.52   0.86    -0.82       back up down left right
 # Part 2
--1.52   -0.66   0.82        -1.02   0.86    -0.82       UNGU
-# Part 3
--1.02   -0.86   0.82        0.82    0.86    -0.82       UNGU
+-1.52   -0.66   0.82        -1.02   0.86    -0.82       up down left right
+# Part 3.1
+-1.02   0.20    0.82        0.82    0.86    -0.82       front up left right
+# Part 3.2
+-1.02   -0.86   0.82        0.82    0.20    -0.82       down left right
 # Part 4
-0.82    0.20    0.82        1.02    -0.66   -0.82       UNGU
+0.82    0.20    0.82        1.02    -0.66   -0.82       up down left right
 # Part 5
-1.02    -0.66   0.82        1.52    0.20    -0.82       UNGU
+1.02    -0.66   0.82        1.52    0.20    -0.82       up down left right
 # Part 6
-1.52    -0.86   0.82        1.82    0.20    -0.82       UNGU
+1.52    -0.86   0.82        1.82    0.20    -0.82       front up down left right
