@@ -14,15 +14,23 @@
 ###
 # Part 1
 -1.82   -0.86   0.82        -1.52   0.86    -0.82       back up down left right
+# Part 1 sekitar roda
+-1.52   -0.86   0.82        -1.52   -0.66   -0.82       front
 # Part 2
 -1.52   -0.66   0.82        -1.02   0.86    -0.82       up down left right
 # Part 3.1
 -1.02   0.20    0.82        0.82    0.86    -0.82       front up left right
 # Part 3.2
 -1.02   -0.86   0.82        0.82    0.20    -0.82       down left right
+# Part 3 sekitar roda
+-1.02   -0.86   0.82        0.82    -0.66   -0.82       back
 # Part 4
 0.82    0.20    0.82        1.02    -0.66   -0.82       up down left right
+# Part 4 sekitar roda
+0.82    0.20    0.82        1.02    -0.66   -0.82       front
 # Part 5
 1.02    -0.66   0.82        1.52    0.20    -0.82       up down left right
 # Part 6
 1.52    -0.86   0.82        1.82    0.20    -0.82       front up down left right
+# Part 6 sekitar roda
+1.52    -0.86   0.82        1.82    -0.66   -0.82       back
