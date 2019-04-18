@@ -71,23 +71,39 @@ class VertexGenerator():
 	def __createSquareAlongYZAxis(self, y1, z1, y2, z2, x):
 		return self.__createSquareWithConstantAxis(y1, z1, y2, z2, x, Axis.X)
 
-	def __createCube(self, x1, y1, z1, x2, y2, z2):
+	def __createCube(self, x1, y1, z1, x2, y2, z2, edges):
+		temp = []
 		separator = self.__createSeparator(10)
 
-		front = self.__createSquareAlongXYAxis(x1, y1, x2, y2, z1)
-		back = self.__createSquareAlongXYAxis(x1, y1, x2, y2, z2)
+		if "front" in edges:
+			front = self.__createSquareAlongXYAxis(x1, y1, x2, y2, z1)
+			temp.append(front)
 
-		top = self.__createSquareAlongXZAxis(x1, z1, x2, z2, y1)
-		bottom = self.__createSquareAlongXZAxis(x1, z1, x2, z2, y2)
+		if "back" in edges:
+			back = self.__createSquareAlongXYAxis(x1, y1, x2, y2, z2)
+			temp.append(back)
 
-		left = self.__createSquareAlongYZAxis(y1, z1, y2, z2, x1)
-		right = self.__createSquareAlongYZAxis(y1, z1, y2, z2, x2)
+		if "up" in edges:
+			top = self.__createSquareAlongXZAxis(x1, z1, x2, z2, y1)
+			temp.append(top)
 
-		return "\n{}\n".format(separator).join([front, back, left, right, top, bottom])
+		if "down" in edges:
+			bottom = self.__createSquareAlongXZAxis(x1, z1, x2, z2, y2)
+			temp.append(bottom)
 
-	def createCube(self, x1, y1, z1, x2, y2, z2):
-		return self.__createCube(x1, y1, z1, x2, y2, z2)
+		if "left" in edges:
+			left = self.__createSquareAlongYZAxis(y1, z1, y2, z2, x1)
+			temp.append(left)
+
+		if "right" in edges:
+			right = self.__createSquareAlongYZAxis(y1, z1, y2, z2, x2)
+			temp.append(right)
+
+		return "\n{}\n".format(separator).join(temp)
+
+	def createCube(self, x1, y1, z1, x2, y2, z2, edges):
+		return self.__createCube(x1, y1, z1, x2, y2, z2, edges)
 
 if __name__ == "__main__":
 	sf = VertexGenerator()
-	print(sf.createCube(0, 3, 0, 4, 0, 3))
+	# print(sf.createCube(0, 3, 0, 4, 0, 3))
