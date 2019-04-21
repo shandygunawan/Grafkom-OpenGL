@@ -8,7 +8,8 @@ class Point():
 		self.z = z
 
 	def __repr__(self):
-		return "{} {} {}".format(self.x, self.y, self.z)
+		return ", ".join(map(str, [self.x, self.y, self.z]))
+		# return "{} {} {}".format(self.x, self.y, self.z)
 
 class Axis(Enum):
 	X = auto()
@@ -21,7 +22,7 @@ class VertexGenerator():
 		pass
 
 	def __createTriangle(self, p1, p2, p3):
-		return "\n".join(map(str, [p1, p2, p3]))
+		return ", ".join(map(str, [p1, p2, p3]))
 
 	def __createSeparator(self, length):
 		return "# {}".format("=" * length)
