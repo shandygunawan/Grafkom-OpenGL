@@ -12,6 +12,7 @@
 #include <sstream>
 #include "GlobalLib.h"
 #include "CameraController.hpp"
+#include "LightController.hpp"
 #include "Drawer.hpp"
 
 using namespace std;
@@ -23,6 +24,9 @@ private:
 
 	// Camera
 	CameraController cameraController;
+
+	// Lights
+	// LightController lightController;
 
 	// Model
 	Model model;
@@ -121,6 +125,10 @@ int AppController::init(){
     // Setup Camera with its controller
     cameraController.setWindow(window);
     cameraController.setShaderID(drawer.getShaderID());
+
+    // Setup Light
+    // lightController.setShaderID(drawer.getShaderID());
+    // lightController.setLight();
 
     return 0;
 }
