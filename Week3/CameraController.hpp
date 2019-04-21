@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include "GlobalLib.h"
 
 class CameraController {
@@ -14,7 +15,9 @@ private:
 	glm::mat4 ViewMatrix;
 	glm::mat4 ProjectionMatrix;
 	GLuint shaderID;
-	GLuint matrixID;  // Get a handle for our "MVP" uniform
+	GLuint modelID;  // Get a handle for our "MVP" uniform
+	GLuint projectionID;
+	GLuint viewID;
 	glm::vec3 position = glm::vec3(5, 2.5, 5); // position
 	float horizontalAngle = 3.14f; // Horizontal angle: toward-Z
 	float verticalAngle = 0.0f; // Vertical angle: 0, look at the horizon
@@ -65,7 +68,9 @@ void CameraController::setShaderID(GLuint id){
 }
 
 void CameraController::setMatrixID(){
-	matrixID = glGetUniformLocation(shaderID, "MVP");
+	modelID = glGetUniformLocation(shaderID, "model");
+	projectionID = glGetUniformLocation(shaderID, "projection");
+	viewID = glGetUniformLocation(shaderID, "view");
 }
 
 /* =============================================
@@ -92,7 +97,9 @@ void CameraController::controlView(){
 
 	// Send our transformation to the currently bound shader, 
 	// in the "MVP" uniform
-	glUniformMatrix4fv(matrixID, 1, GL_FALSE, &MVP[0][0]);
+	glUniformMatrix4fv(modelID, 1, GL_FALSE, glm::value_ptr(ModelMatrix));
+	glUniformMatrix4fv(projectionID, 1, GL_FALSE, glm::value_ptr(ProjectionMatrix));
+	glUniformMatrix4fv(viewID, 1, GL_FALSE, glm::value_ptr(ViewMatrix));
 }
 
 /* =============================================
