@@ -25,7 +25,7 @@
 # Part 5
 1.02    -0.66   0.82        1.52    0.20    -0.82       front back up down
 # Part 6
-1.52    -0.86   0.82        1.82    0.20    -0.82       front bback up down right
+1.52    -0.86   0.82        1.82    0.20    -0.82       front back up down right
 # Sekitar ban belakang
 -1.52	-0.86	0.82		-1.02	-0.66	-0.82		left right
 # Sekitar ban depan
