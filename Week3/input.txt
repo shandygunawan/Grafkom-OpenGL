@@ -13,24 +13,20 @@
 # BADAN MOBIL
 ###
 # Part 1
--1.82   -0.86   0.82        -1.52   0.86    -0.82       back up down left right
-# Part 1 sekitar roda
--1.52   -0.86   0.82        -1.52   -0.66   -0.82       front
+-1.82   -0.86   0.82        -1.52   0.86    -0.82       front back up down left 
 # Part 2
--1.52   -0.66   0.82        -1.02   0.86    -0.82       up down left right
+-1.52   -0.66   0.82        -1.02   0.86    -0.82       front back up down
 # Part 3.1
--1.02   0.20    0.82        0.82    0.86    -0.82       front up left right
+-1.02   0.20    0.82        0.82    0.86    -0.82       front back down right
 # Part 3.2
--1.02   -0.86   0.82        0.82    0.20    -0.82       down left right
-# Part 3 sekitar roda
--1.02   -0.86   0.82        0.82    -0.66   -0.82       back
+-1.02   -0.86   0.82        0.82    0.20    -0.82       front back up
 # Part 4
-0.82    0.20    0.82        1.02    -0.66   -0.82       up down left right
-# Part 4 sekitar roda
-0.82    0.20    0.82        1.02    -0.66   -0.82       front
+0.82    0.20    0.82        1.02    -0.66   -0.82       front back up down
 # Part 5
-1.02    -0.66   0.82        1.52    0.20    -0.82       up down left right
+1.02    -0.66   0.82        1.52    0.20    -0.82       front back up down
 # Part 6
-1.52    -0.86   0.82        1.82    0.20    -0.82       front up down left right
-# Part 6 sekitar roda
-1.52    -0.86   0.82        1.82    -0.66   -0.82       back
+1.52    -0.86   0.82        1.82    0.20    -0.82       front bback up down right
+# Sekitar ban belakang
+-1.52	-0.86	0.82		-1.02	-0.66	-0.82		left right
+# Sekitar ban depan
+1.02	-0.86	0.82		1.52	-0.66	-0.82		left right
