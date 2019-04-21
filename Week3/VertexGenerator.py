@@ -77,26 +77,32 @@ class VertexGenerator():
 		separator = self.__createSeparator(10)
 
 		if "front" in edges:
+			# Point 1 and Point 2 with Z of Point 1
 			front = self.__createSquareAlongXYAxis(x1, y1, x2, y2, z1)
 			temp.append(front)
 
 		if "back" in edges:
+			# Point 1 and Point 2 with Z of Point 2
 			back = self.__createSquareAlongXYAxis(x1, y1, x2, y2, z2)
 			temp.append(back)
 
 		if "up" in edges:
+			# Point 1 and Point 2 with Y of Point 1
 			top = self.__createSquareAlongXZAxis(x1, z1, x2, z2, y1)
 			temp.append(top)
 
 		if "down" in edges:
+			# Point 1 and Point 2 with Y of Point 2
 			bottom = self.__createSquareAlongXZAxis(x1, z1, x2, z2, y2)
 			temp.append(bottom)
 
 		if "left" in edges:
+			# Point 1 and Point 2 with X of Point 1
 			left = self.__createSquareAlongYZAxis(y1, z1, y2, z2, x1)
 			temp.append(left)
 
 		if "right" in edges:
+			# Point 1 and Point 2 with X of Point 2
 			right = self.__createSquareAlongYZAxis(y1, z1, y2, z2, x2)
 			temp.append(right)
 
