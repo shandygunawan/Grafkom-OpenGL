@@ -29,7 +29,7 @@ class VertexGenerator():
 
 	def __createSquare(self, lower_half, upper_half):
 		separator = self.__createSeparator(3)
-		return "\n{}\n".format(separator).join([lower_half, upper_half])
+		return "\n{}\n".format(separator).join([lower_half + ",", upper_half + ","])
 
 	def __createSquareWithConstantAxis(self, a1, b1, a2, b2, c, axis):
 		temp = []
