@@ -318,7 +318,6 @@ void Drawer::createVBOs(){
 }
 
 void Drawer::bindVBOs(){
-	// Draw vertices
 	glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, vertices_vbo);
     glVertexAttribPointer(
@@ -328,7 +327,7 @@ void Drawer::bindVBOs(){
 		GL_FALSE,           // normalized?
 		0,                  // stride
 		(void*)0            // array buffer offset
-    );
+    );    
 }
 
 

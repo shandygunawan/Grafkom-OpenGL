@@ -127,8 +127,9 @@ int AppController::init(){
     cameraController.setShaderID(drawer.getShaderID());
 
     // Setup Light
+    // glm::vec3 lightColor(1.0f, 1.0f, 0.0f);
     // lightController.setShaderID(drawer.getShaderID());
-    // lightController.setLight();
+    // lightController.setLightColor(lightColor);
 
     return 0;
 }

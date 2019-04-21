@@ -21,7 +21,7 @@ public:
 
 	void setShaderID(GLuint id);
 	void setLightID();
-	void setLight();
+	void setLightColor(glm::vec3 color);
 };
 
 LightController::LightController(){
@@ -34,12 +34,12 @@ void LightController::setShaderID(GLuint id){
 }
 
 void LightController::setLightID(){
-	lightID = glGetUniformLocation(shaderID, "lightPos");
+	lightID = glGetUniformLocation(shaderID, "lightColor");
 }
 
 
-void LightController::setLight(){
-	glUniform3fv(lightID, 1, GL_FALSE);
+void LightController::setLightColor(glm::vec3 color){
+	glUniform3fv(lightID, 1, glm::value_ptr(color));
 }
 
 #endif
