@@ -11,7 +11,7 @@
 #include "GlobalLib.h"
 #include "Utils.hpp"
 #include "Model.hpp"
-// #include "ParticleController.hpp"
+#include "ParticleController.hpp"
 
 using namespace std;
 
@@ -22,7 +22,7 @@ private:
 	GLuint model_vbo;
 	
 	// Particle
-	// ParticleController particleController;
+	ParticleController particleController;
 
 	// Shader & Textures
 	GLuint shaderID;
@@ -101,6 +101,8 @@ void Drawer::destroy(){
 	glDeleteProgram(shaderID);
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &model_vbo);
+
+	// particleController.destroy();
 }
 
 /* =============================================
@@ -193,8 +195,7 @@ void Drawer::drawModel(){
 }
 
 void Drawer::drawParticles(){
-	// Need to bind particles first before drawing? particleController.bind()
-	particleController.draw();
+	particleController.drawParticles();
 }
 
 /* =============================================

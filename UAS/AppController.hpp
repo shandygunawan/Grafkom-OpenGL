@@ -130,7 +130,6 @@ void AppController::close(){
 
 // Run the app
 void AppController::run(){
-
 	do{
 		// Clear the screen.
 		drawer.clearBackground();
@@ -143,7 +142,7 @@ void AppController::run(){
         glBindVertexArray(drawer.getVAO());
         
         // Draw Images to screen
-        drawer.drawModel();
+        // drawer.drawModel();
 		drawer.drawParticles();
 		
 		// Swap buffers

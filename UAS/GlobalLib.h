@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/norm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 // STRUCT
@@ -15,12 +16,17 @@ struct RGB {
 	GLfloat A; // Alpha
 };
 
-struct Particle{
-	glm::vec2 pos, speed;
-	glm::vec4 color;
-	GLfloat life;
+struct Particle {
+	glm::vec3 pos, speed;
+	unsigned char r,g,b,a; // Color
+	float size, angle, weight;
+	float life; // Remaining life of the particle. if < 0 : dead and unused.
+	float cameradistance; // *Squared* distance to the camera. if dead : -1.0f
 
-	Particle() : pos(0.0f), speed(0.0f), color(0.0f), life(0.0f) {}
+	bool operator<(const Particle& that) const {
+		// Sort in reverse order : far particles drawn first.
+		return this->cameradistance > that.cameradistance;
+	}
 };
 
 // APP SETTINGS
@@ -88,11 +94,20 @@ GLfloat texture_data[] {
 		0.76f, 1.0f-0.531f,      1.0f, 1.0f-0.531f,       0.76f, 0.0f,          1.0f, 1.0f-0.531f,   0.76f, 0.0f,         1.0f, 0.0f // Top
 };
 
-GLfloat particle_smoke_buffer_data[] = {
-		-0.5f, -0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f,
-		-0.5f, 0.5f, 0.0f,
-		0.5f, 0.5f, 0.0f
+// GLfloat particle_buffer_data[] = { // g_vertex_buffer_data
+// 		-0.5f, -0.5f, 0.0f,
+// 		0.5f, -0.5f, 0.0f,
+// 		-0.5f, 0.5f, 0.0f,
+// 		0.5f, 0.5f, 0.0f
+// };
+
+static GLfloat* g_particule_position_size_data = new GLfloat[PARTICLE_MAX_NUMBER * 4];;
+static GLubyte* g_particule_color_data = new GLubyte[PARTICLE_MAX_NUMBER * 4];
+static const GLfloat g_vertex_buffer_data[] = { 
+	 -0.5f, -0.5f, 0.0f,
+	  0.5f, -0.5f, 0.0f,
+	 -0.5f,  0.5f, 0.0f,
+	  0.5f,  0.5f, 0.0f,
 };
 
 #endif
