@@ -193,7 +193,8 @@ void Drawer::drawModel(){
 }
 
 void Drawer::drawParticles(){
-
+	// Need to bind particles first before drawing? particleController.bind()
+	particleController.draw();
 }
 
 /* =============================================

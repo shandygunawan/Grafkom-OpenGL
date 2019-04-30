@@ -37,7 +37,7 @@ struct Particle{
 #define LOCATION_PARTICLE_COLOR 4
 
 // PARTICLE
-#define PARTICLE_NUMBER 500
+#define PARTICLE_MAX_NUMBER 500
 
 // Other
 #define GRID_SIZE 20

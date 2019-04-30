@@ -144,6 +144,7 @@ void AppController::run(){
         
         // Draw Images to screen
         drawer.drawModel();
+		drawer.drawParticles();
 		
 		// Swap buffers
 		glfwSwapBuffers(window);

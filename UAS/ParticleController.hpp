@@ -4,21 +4,30 @@
 #include <vector>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 #include "GlobalLib.h"
 
 using namespace std;
 
+// CPU representation of a particle
+struct Particle {
+	glm::vec3 pos, speed;
+	unsigned char r,g,b,a; // Color
+	float size, angle, weight;
+	float life; // Remaining life of the particle. if < 0 : dead and unused.
+};
+
 class ParticleController {
 private:
-	vector<Particle> particles;
-	GLuint vertices_vbo;
-	GLuint properties_vbo;
-	GLuint color_vbo;
+	Particle particles_container[PARTICLE_MAX_NUMBER];
+	GLuint vertices_vbo; // billboard_vertex_buffer
+	GLuint properties_vbo; // particles_position_buffer
+	GLuint color_vbo; // particles_color_buffer
 	int last_used_particle = 0;
-	int 
+	int particles_count = 0;
 
 public:
-	ParticleController(GLfloat *particle_buffer_data);
+	ParticleController(GLfloat *particle_buffer_data); // g_vertex_buffer_data
 
 	void loadVertices();
 	void loadProperties();
@@ -57,7 +66,7 @@ void ParticleController::loadProperties(){
 
 	glBindBuffer(GL_ARRAY_BUFFER, properties_vbo);
 	glBufferData(GL_ARRAY_BUFFER, PARTICLE_MAX_NUMBER * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See above link for details.
-	glBufferSubData(GL_ARRAY_BUFFER, 0, ParticlesCount * sizeof(GLfloat) * 4, g_particule_position_size_data);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, particles_count * sizeof(GLfloat) * 4, g_particule_position_size_data);
 
 }
 
@@ -70,7 +79,7 @@ void ParticleController::loadColor(){
 
 	glBindBuffer(GL_ARRAY_BUFFER, color_vbo);
 	glBufferData(GL_ARRAY_BUFFER, PARTICLE_MAX_NUMBER * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See above link for details.
-	glBufferSubData(GL_ARRAY_BUFFER, 0, ParticlesCount * sizeof(GLubyte) * 4, g_particule_color_data);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, particles_count * sizeof(GLubyte) * 4, g_particule_color_data);
 }
 
 void ParticleController::bind(){
@@ -123,23 +132,23 @@ void ParticleController::draw(){
 	// Draw the particules !
 	// This draws many times a small triangle_strip (which looks like a quad).
 	// This is equivalent to :
-	// for(i in ParticlesCount) : glDrawArrays(GL_TRIANGLE_STRIP, 0, 4),
+	// for(i in particles_count) : glDrawArrays(GL_TRIANGLE_STRIP, 0, 4),
 	// but faster.
-	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, ParticlesCount);
+	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, particles_count);
 }
 
-// Finds a Particle in ParticlesContainer which isn't used yet.
+// Finds a Particle in particles_container which isn't used yet.
 // (i.e. life < 0)
 int ParticleController::findUnusedParticle(){
 	for(int i=last_used_particle; i<PARTICLE_MAX_NUMBER; i++){
-        if (ParticlesContainer[i].life < 0){
+        if (particles_container[i].life < 0){
             last_used_particle = i;
             return i;
         }
     }
 
     for(int i=0; i<last_used_particle; i++){
-        if (ParticlesContainer[i].life < 0){
+        if (particles_container[i].life < 0){
             last_used_particle = i;
             return i;
         }
