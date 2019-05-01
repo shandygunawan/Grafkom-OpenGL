@@ -37,7 +37,7 @@ const int MaxParticles = 100000;
 Particle ParticlesContainer[MaxParticles];
 int LastUsedParticle = 0;
 
-const int MaxSmokeParticles = 10000;
+const int MaxSmokeParticles = 100;
 
 // Finds a Particle in ParticlesContainer which isn't used yet.
 // (i.e. life < 0);
@@ -62,6 +62,65 @@ int FindUnusedParticle(){
 
 void SortParticles(){
 	std::sort(&ParticlesContainer[0], &ParticlesContainer[MaxParticles]);
+}
+
+void InitSmokeParticle(int particleIndex){
+	ParticlesContainer[particleIndex].life = 0.25f; // This particle will live 0.25 seconds.
+	ParticlesContainer[particleIndex].pos = glm::vec3(0,0, -5.0f); // Initial particle position
+
+	float spread = 1.5f;
+	glm::vec3 maindir = glm::vec3(5.0f, 5.0f, -20.0f);
+	// Very bad way to generate a random direction; 
+	// See for instance http://stackoverflow.com/questions/5408276/python-uniform-spherical-distribution instead,
+	// combined with some user-controlled parameters (main direction, spread, etc)
+	glm::vec3 randomdir = glm::vec3(
+		(rand()%2000 - 1000.0f)/1000.0f,
+		(rand()%2000 - 1000.0f)/1000.0f,
+		(rand()%2000 - 1000.0f)/1000.0f
+	);
+	
+	float speedMultiplier = 2.0f;
+	ParticlesContainer[particleIndex].speed = (maindir + randomdir*spread) * speedMultiplier;
+
+
+	// Set color to grey
+	ParticlesContainer[particleIndex].r = 128;
+	ParticlesContainer[particleIndex].g = 128;
+	ParticlesContainer[particleIndex].b = 128;
+	ParticlesContainer[particleIndex].a = 255;
+
+	ParticlesContainer[particleIndex].size = (rand()%1000)/2000.0f + 0.1f;
+}
+
+
+void CreateRainParticle(int particleIndex) {
+
+	ParticlesContainer[particleIndex].life = 10.0f; // This particle will live 10 seconds.
+	ParticlesContainer[particleIndex].pos = glm::vec3(0,10.0f,0.0f);
+
+	float spread = 20.f;
+	glm::vec3 maindir = glm::vec3(0.0f, -10.0f, 0.0f);
+
+	// Very bad way to generate a random direction; 
+	// See for instance http://stackoverflow.com/questions/5408276/python-uniform-spherical-distribution instead,
+	// combined with some user-controlled parameters (main direction, spread, etc)
+	glm::vec3 randomdir = glm::vec3(
+		(rand()%2000 - 1000.0f)/1000.0f,
+		0.0f,
+		(rand()%2000 - 1000.0f)/1000.0f
+	);
+	
+	ParticlesContainer[particleIndex].speed = maindir + randomdir*spread;
+
+
+	// Very bad way to generate a random color
+	ParticlesContainer[particleIndex].r = 128;
+	ParticlesContainer[particleIndex].g = 206;
+	ParticlesContainer[particleIndex].b = 207;
+
+	ParticlesContainer[particleIndex].a = (rand() % 256) / 3;
+
+	ParticlesContainer[particleIndex].size = (rand()%1000)/2000.0f + 0.1f;
 }
 
 int main( void )
@@ -202,23 +261,21 @@ int main( void )
 		// Generate 10 new particule each millisecond,
 		// but limit this to 16 ms (60 fps), or if you have 1 long frame (1sec),
 		// newparticles will be huge and the next frame even longer.
-		int newparticles = (int)(delta*10000.0);
-		if (newparticles > (int)(0.016f*10000.0))
-			newparticles = (int)(0.016f*10000.0);
+		double particleCount = 0.2 ; // per millisecond
+		int newparticles = (int)(delta*particleCount*1000.0);
+		if (newparticles > (int)(0.016f*particleCount*1000.0))
+			newparticles = (int)(0.016f*particleCount*1000.0);
 		
 		for(int i=0; i<newparticles; i++){
 			int particleIndex = FindUnusedParticle();
 
 			if (particleIndex < MaxSmokeParticles) {
 				// Insert smoke here
-				CreateRainParticle(particleIndex);
+				InitSmokeParticle(particleIndex);
 			} else {
 				// Insert rain here
 				CreateRainParticle(particleIndex);
-			}
-
-
-			
+			}			
 		}
 
 
@@ -239,7 +296,7 @@ int main( void )
 					p.speed += glm::vec3(0.0f,-9.81f, 0.0f) * (float)delta * 0.5f;
 					p.pos += p.speed * (float)delta;
 					p.cameradistance = glm::length2( p.pos - CameraPosition );
-					//ParticlesContainer[i].pos += glm::vec3(0.0f,10.0f, 0.0f) * (float)delta;
+					// ParticlesContainer[i].pos += glm::vec3(0.0f,10.0f, 0.0f) * (float)delta;
 
 					// Fill the GPU buffer
 					g_particule_position_size_data[4*ParticlesCount+0] = p.pos.x;
@@ -381,40 +438,4 @@ int main( void )
 	glfwTerminate();
 
 	return 0;
-}
-
-
-
-
-
-
-
-void CreateRainParticle(int particleIndex) {
-
-	ParticlesContainer[particleIndex].life = 10.0f; // This particle will live 10 seconds.
-	ParticlesContainer[particleIndex].pos = glm::vec3(0,10.0f,0.0f);
-
-	float spread = 20.f;
-	glm::vec3 maindir = glm::vec3(0.0f, -10.0f, 0.0f);
-
-	// Very bad way to generate a random direction; 
-	// See for instance http://stackoverflow.com/questions/5408276/python-uniform-spherical-distribution instead,
-	// combined with some user-controlled parameters (main direction, spread, etc)
-	glm::vec3 randomdir = glm::vec3(
-		(rand()%2000 - 1000.0f)/1000.0f,
-		0.0f,
-		(rand()%2000 - 1000.0f)/1000.0f
-	);
-	
-	ParticlesContainer[particleIndex].speed = maindir + randomdir*spread;
-
-
-	// Very bad way to generate a random color
-	ParticlesContainer[particleIndex].r = 128;
-	ParticlesContainer[particleIndex].g = 206;
-	ParticlesContainer[particleIndex].b = 207;
-
-	ParticlesContainer[particleIndex].a = (rand() % 256) / 3;
-
-	ParticlesContainer[particleIndex].size = (rand()%1000)/2000.0f + 0.1f;
 }
