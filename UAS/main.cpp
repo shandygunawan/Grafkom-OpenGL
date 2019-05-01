@@ -208,7 +208,7 @@ int main( void )
 		for(int i=0; i<newparticles; i++){
 			int particleIndex = FindUnusedParticle();
 			ParticlesContainer[particleIndex].life = 0.25f; // This particle will live 0.25 seconds.
-			ParticlesContainer[particleIndex].pos = glm::vec3(0,0,-20.0f);
+			ParticlesContainer[particleIndex].pos = glm::vec3(0,0, -5.0f); // Initial particle position
 
 			float spread = 1.5f;
 			glm::vec3 maindir = glm::vec3(0.0f, 10.0f, 0.0f);
