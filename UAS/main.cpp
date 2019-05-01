@@ -211,7 +211,7 @@ int main( void )
 			ParticlesContainer[particleIndex].pos = glm::vec3(0,0, -5.0f); // Initial particle position
 
 			float spread = 1.5f;
-			glm::vec3 maindir = glm::vec3(0.0f, 10.0f, 0.0f);
+			glm::vec3 maindir = glm::vec3(5.0f, 5.0f, -20.0f);
 			// Very bad way to generate a random direction; 
 			// See for instance http://stackoverflow.com/questions/5408276/python-uniform-spherical-distribution instead,
 			// combined with some user-controlled parameters (main direction, spread, etc)
