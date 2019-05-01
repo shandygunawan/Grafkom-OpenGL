@@ -223,11 +223,11 @@ int main( void )
 			ParticlesContainer[particleIndex].speed = maindir + randomdir*spread;
 
 
-			// Very bad way to generate a random color
-			ParticlesContainer[particleIndex].r = rand() % 256;
-			ParticlesContainer[particleIndex].g = rand() % 256;
-			ParticlesContainer[particleIndex].b = rand() % 256;
-			ParticlesContainer[particleIndex].a = (rand() % 256) / 3;
+			// Set color to grey
+			ParticlesContainer[particleIndex].r = 128;
+			ParticlesContainer[particleIndex].g = 128;
+			ParticlesContainer[particleIndex].b = 128;
+			ParticlesContainer[particleIndex].a = 255;
 
 			ParticlesContainer[particleIndex].size = (rand()%1000)/2000.0f + 0.1f;
 			
