@@ -269,7 +269,7 @@ int main( void )
 		for(int i=0; i<newparticles; i++){
 			int particleIndex = FindUnusedParticle();
 
-			if (particleIndex < MaxSmokeParticles) {
+			if (particleIndex&1) {
 				// Insert smoke here
 				InitSmokeParticle(particleIndex);
 			} else {
