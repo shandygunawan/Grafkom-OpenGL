@@ -221,7 +221,8 @@ int main( void )
 				(rand()%2000 - 1000.0f)/1000.0f
 			);
 			
-			ParticlesContainer[particleIndex].speed = maindir + randomdir*spread;
+			float speedMultiplier = 2.0f;
+			ParticlesContainer[particleIndex].speed = (maindir + randomdir*spread) * speedMultiplier;
 
 
 			// Set color to grey
