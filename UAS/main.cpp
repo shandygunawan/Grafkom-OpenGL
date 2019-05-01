@@ -62,6 +62,34 @@ void SortParticles(){
 	std::sort(&ParticlesContainer[0], &ParticlesContainer[MaxParticles]);
 }
 
+void InitSmokeParticle(int particleIndex){
+	ParticlesContainer[particleIndex].life = 0.25f; // This particle will live 0.25 seconds.
+	ParticlesContainer[particleIndex].pos = glm::vec3(0,0, -5.0f); // Initial particle position
+
+	float spread = 1.5f;
+	glm::vec3 maindir = glm::vec3(5.0f, 5.0f, -20.0f);
+	// Very bad way to generate a random direction; 
+	// See for instance http://stackoverflow.com/questions/5408276/python-uniform-spherical-distribution instead,
+	// combined with some user-controlled parameters (main direction, spread, etc)
+	glm::vec3 randomdir = glm::vec3(
+		(rand()%2000 - 1000.0f)/1000.0f,
+		(rand()%2000 - 1000.0f)/1000.0f,
+		(rand()%2000 - 1000.0f)/1000.0f
+	);
+	
+	float speedMultiplier = 2.0f;
+	ParticlesContainer[particleIndex].speed = (maindir + randomdir*spread) * speedMultiplier;
+
+
+	// Set color to grey
+	ParticlesContainer[particleIndex].r = 128;
+	ParticlesContainer[particleIndex].g = 128;
+	ParticlesContainer[particleIndex].b = 128;
+	ParticlesContainer[particleIndex].a = 255;
+
+	ParticlesContainer[particleIndex].size = (rand()%1000)/2000.0f + 0.1f;
+}
+
 int main( void )
 {
 	// Initialise GLFW
@@ -207,32 +235,7 @@ int main( void )
 		
 		for(int i=0; i<newparticles; i++){
 			int particleIndex = FindUnusedParticle();
-			ParticlesContainer[particleIndex].life = 0.25f; // This particle will live 0.25 seconds.
-			ParticlesContainer[particleIndex].pos = glm::vec3(0,0, -5.0f); // Initial particle position
-
-			float spread = 1.5f;
-			glm::vec3 maindir = glm::vec3(5.0f, 5.0f, -20.0f);
-			// Very bad way to generate a random direction; 
-			// See for instance http://stackoverflow.com/questions/5408276/python-uniform-spherical-distribution instead,
-			// combined with some user-controlled parameters (main direction, spread, etc)
-			glm::vec3 randomdir = glm::vec3(
-				(rand()%2000 - 1000.0f)/1000.0f,
-				(rand()%2000 - 1000.0f)/1000.0f,
-				(rand()%2000 - 1000.0f)/1000.0f
-			);
-			
-			float speedMultiplier = 2.0f;
-			ParticlesContainer[particleIndex].speed = (maindir + randomdir*spread) * speedMultiplier;
-
-
-			// Set color to grey
-			ParticlesContainer[particleIndex].r = 128;
-			ParticlesContainer[particleIndex].g = 128;
-			ParticlesContainer[particleIndex].b = 128;
-			ParticlesContainer[particleIndex].a = 255;
-
-			ParticlesContainer[particleIndex].size = (rand()%1000)/2000.0f + 0.1f;
-			
+			InitSmokeParticle(particleIndex);
 		}
 
 
