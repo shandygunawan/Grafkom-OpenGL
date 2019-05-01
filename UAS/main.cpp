@@ -215,10 +215,11 @@ int main( void )
     int triangleCount = (sizeof(model_vbo_data)/sizeof(GLfloat))/3;
     glBufferData(GL_ARRAY_BUFFER, sizeof(model_vbo_data), model_vbo_data, GL_STATIC_DRAW);
 
-    GLuint model_texture_id = loadBMP_glfw("car_image.jpg");
+    GLuint model_texture_vbo;
+    GLuint model_texture = loadBMP_glfw("car_image.jpg");
     GLuint model_texture_sampler = glGetUniformLocation(shaderID, "textureSampler");
-    glGenBuffers(1, &model_texture_id);
-    glBindBuffer(GL_ARRAY_BUFFER, model_texture_id);
+    glGenBuffers(1, &model_texture_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, model_texture_vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(model_texture_data), model_texture_data, GL_STATIC_DRAW);
 
     GLuint modelID = glGetUniformLocation(shaderID, "model");
@@ -271,6 +272,7 @@ int main( void )
 		lastTime = currentTime;
 
 		glUseProgram(shaderID);
+	
 
 		computeMatricesFromInputs();
 		ProjectionMatrix = getProjectionMatrix();
@@ -282,7 +284,7 @@ int main( void )
 
 		// Bind our texture in Texture Unit 1
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, model_texture_id);
+		glBindTexture(GL_TEXTURE_2D, model_texture);
 		// Set our "myTextureSampler" sampler to use Texture Unit 0
 		glUniform1i(model_texture_sampler, 1);
 
@@ -299,7 +301,7 @@ int main( void )
 
 	    // 2nd attribute buffer : UVs
 		glEnableVertexAttribArray(5);
-		glBindBuffer(GL_ARRAY_BUFFER, model_texture_id);
+		glBindBuffer(GL_ARRAY_BUFFER, model_texture_vbo);
 		glVertexAttribPointer(
 			5,                                // attribute. No particular reason for 1, but must match the layout in the shader.
 			2,                                // size : U+V => 2

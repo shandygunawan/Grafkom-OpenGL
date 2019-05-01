@@ -2,10 +2,10 @@
 
 // Input vertex data, different for all executions of this shader.
 layout(location = 4) in vec3 vertexPosition_modelspace;
-layout(location = 5) in vec3 vertexColor;
+layout(location = 5) in vec2 vertexUV;
 
 // Output data ; will be interpolated for each fragment.
-out vec3 fragmentColor;
+out vec2 UV;
 
 // Values that stay constant for the whole mesh.
 uniform mat4 model;
@@ -18,6 +18,6 @@ void main(){
 	gl_Position =  projection * view * model * vec4(vertexPosition_modelspace,1);
 	// The color of each vertex will be interpolated
 	// to produce the color of each fragment
-	fragmentColor = vertexColor;
+	UV = vertexUV;
 }
 
