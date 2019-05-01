@@ -224,9 +224,14 @@ int main( void )
 
 
 			// Very bad way to generate a random color
-			ParticlesContainer[particleIndex].r = rand() % 256;
-			ParticlesContainer[particleIndex].g = rand() % 256;
-			ParticlesContainer[particleIndex].b = rand() % 256;
+			// ParticlesContainer[particleIndex].r = rand() % 256;
+			// ParticlesContainer[particleIndex].g = rand() % 256;
+			// ParticlesContainer[particleIndex].b = rand() % 256;
+
+			ParticlesContainer[particleIndex].r = 255;
+			ParticlesContainer[particleIndex].g = 255;
+			ParticlesContainer[particleIndex].b = 0;
+
 			ParticlesContainer[particleIndex].a = (rand() % 256) / 3;
 
 			ParticlesContainer[particleIndex].size = (rand()%1000)/2000.0f + 0.1f;
