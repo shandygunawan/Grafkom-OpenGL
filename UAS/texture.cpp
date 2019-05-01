@@ -1,3 +1,5 @@
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,6 +8,28 @@
 
 #include <GLFW/glfw3.h>
 
+
+GLuint loadBMP_glfw(char* imagepath) {
+    GLuint textureID;
+
+    glGenTextures(1, &textureID);
+    
+    glBindTexture(GL_TEXTURE_2D, textureID);
+
+    // load and generate the texture
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load(imagepath, &width, &height, &nrChannels, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    stbi_image_free(data);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+    return textureID;
+}
 
 GLuint loadBMP_custom(const char * imagepath){
 

@@ -5,6 +5,7 @@
 #include <algorithm>
 
 #include <GL/glew.h>
+#include <iostream>
 
 #include <GLFW/glfw3.h>
 GLFWwindow* window;
@@ -12,12 +13,14 @@ GLFWwindow* window;
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/norm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 using namespace glm;
 
 
 #include "shader.hpp"
 #include "texture.hpp"
 #include "controls.hpp"
+#include "GlobalLib.h"
 
 // CPU representation of a particle
 struct Particle{
@@ -142,7 +145,7 @@ int main( void )
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// Open a window and create its OpenGL context
-	window = glfwCreateWindow( 1024, 768, "Tutorial 18 - Particules", NULL, NULL);
+	window = glfwCreateWindow(APP_WIDTH, APP_HEIGHT, APP_NAME, NULL, NULL);
 	if( window == NULL ){
 		fprintf( stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n" );
 		getchar();
@@ -183,12 +186,13 @@ int main( void )
 
 
 	// Create and compile our GLSL program from the shaders
+	GLuint shaderID = LoadShaders("VertexShader.vertexshader", "FragmentShader.fragmentshader");
 	GLuint programID = LoadShaders( "Particle.vertexshader", "Particle.fragmentshader" );
 
 	// Vertex shader
 	GLuint CameraRight_worldspace_ID  = glGetUniformLocation(programID, "CameraRight_worldspace");
 	GLuint CameraUp_worldspace_ID  = glGetUniformLocation(programID, "CameraUp_worldspace");
-	GLuint ViewProjMatrixID = glGetUniformLocation(programID, "VP");
+	GLuint ModelViewProjMatrixID = glGetUniformLocation(programID, "MVP");
 
 	// fragment shader
 	GLuint TextureID  = glGetUniformLocation(programID, "myTextureSampler");
@@ -202,6 +206,24 @@ int main( void )
 		ParticlesContainer[i].cameradistance = -1.0f;
 	}
 
+	/**************************************
+					LOAD CAR
+	***************************************/
+	GLuint model_vertices_vbo;
+	glGenBuffers(1, &model_vertices_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, model_vertices_vbo);
+    int triangleCount = (sizeof(model_vbo_data)/sizeof(GLfloat))/3;
+    glBufferData(GL_ARRAY_BUFFER, sizeof(model_vbo_data), model_vbo_data, GL_STATIC_DRAW);
+
+    GLuint model_texture_id = loadBMP_glfw("car_image.jpg");
+    GLuint model_texture_sampler = glGetUniformLocation(shaderID, "textureSampler");
+    glGenBuffers(1, &model_texture_id);
+    glBindBuffer(GL_ARRAY_BUFFER, model_texture_id);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(model_texture_data), model_texture_data, GL_STATIC_DRAW);
+
+    GLuint modelID = glGetUniformLocation(shaderID, "model");
+	GLuint projectionID = glGetUniformLocation(shaderID, "projection");
+	GLuint viewID = glGetUniformLocation(shaderID, "view");
 
 
 	GLuint Texture = loadDDS("particle.DDS");
@@ -233,11 +255,14 @@ int main( void )
 	// Initialize with empty (NULL) buffer : it will be updated later, each frame.
 	glBufferData(GL_ARRAY_BUFFER, MaxParticles * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
 
+	glm::mat4 ProjectionMatrix;
+	glm::mat4 ViewMatrix;
+	glm::mat4 ModelMatrix;
 
-	
 	double lastTime = glfwGetTime();
 	do
 	{
+		
 		// Clear the screen
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -245,10 +270,55 @@ int main( void )
 		double delta = currentTime - lastTime;
 		lastTime = currentTime;
 
+		glUseProgram(shaderID);
 
 		computeMatricesFromInputs();
-		glm::mat4 ProjectionMatrix = getProjectionMatrix();
-		glm::mat4 ViewMatrix = getViewMatrix();
+		ProjectionMatrix = getProjectionMatrix();
+		ViewMatrix = getViewMatrix();
+		ModelMatrix = glm::mat4(1.0);
+		glUniformMatrix4fv(modelID, 1, GL_FALSE, glm::value_ptr(ModelMatrix));
+		glUniformMatrix4fv(projectionID, 1, GL_FALSE, glm::value_ptr(ProjectionMatrix));
+		glUniformMatrix4fv(viewID, 1, GL_FALSE, glm::value_ptr(ViewMatrix));
+
+		// Bind our texture in Texture Unit 1
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, model_texture_id);
+		// Set our "myTextureSampler" sampler to use Texture Unit 0
+		glUniform1i(model_texture_sampler, 1);
+
+		glEnableVertexAttribArray(4);
+	    glBindBuffer(GL_ARRAY_BUFFER, model_vertices_vbo);
+	    glVertexAttribPointer(
+			4,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+			3,                  // size
+			GL_FLOAT,           // type
+			GL_FALSE,           // normalized?
+			0,                  // stride
+			(void*)0            // array buffer offset
+	    );
+
+	    // 2nd attribute buffer : UVs
+		glEnableVertexAttribArray(5);
+		glBindBuffer(GL_ARRAY_BUFFER, model_texture_id);
+		glVertexAttribPointer(
+			5,                                // attribute. No particular reason for 1, but must match the layout in the shader.
+			2,                                // size : U+V => 2
+			GL_FLOAT,                         // type
+			GL_FALSE,                         // normalized?
+			0,                                // stride
+			(void*)0                          // array buffer offset
+		);
+	    
+
+	    glDrawArrays(GL_TRIANGLES, 0, triangleCount);
+
+		glDisableVertexAttribArray(4);
+		glDisableVertexAttribArray(5);
+
+	    
+		computeMatricesFromInputs();
+		ProjectionMatrix = getProjectionMatrix();
+		ViewMatrix = getViewMatrix();
 
 		// We will need the camera's position in order to sort the particles
 		// w.r.t the camera's distance.
@@ -256,7 +326,7 @@ int main( void )
 		// but this works too.
 		glm::vec3 CameraPosition(glm::inverse(ViewMatrix)[3]);
 
-		glm::mat4 ViewProjectionMatrix = ProjectionMatrix * ViewMatrix;
+		glm::mat4 ModelViewProjectionMatrix = ModelMatrix * ProjectionMatrix * ViewMatrix;
 
 
 		// Generate 10 new particule each millisecond,
@@ -326,8 +396,6 @@ int main( void )
 		// There are much more sophisticated means to stream data from the CPU to the GPU, 
 		// but this is outside the scope of this tutorial.
 		// http://www.opengl.org/wiki/Buffer_Object_Streaming
-
-
 		glBindBuffer(GL_ARRAY_BUFFER, particles_position_buffer);
 		glBufferData(GL_ARRAY_BUFFER, MaxParticles * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See above link for details.
 		glBufferSubData(GL_ARRAY_BUFFER, 0, ParticlesCount * sizeof(GLfloat) * 4, g_particule_position_size_data);
@@ -337,8 +405,8 @@ int main( void )
 		glBufferSubData(GL_ARRAY_BUFFER, 0, ParticlesCount * sizeof(GLubyte) * 4, g_particule_color_data);
 
 
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		// glEnable(GL_BLEND);
+		// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		// Use our shader
 		glUseProgram(programID);
@@ -353,7 +421,7 @@ int main( void )
 		glUniform3f(CameraRight_worldspace_ID, ViewMatrix[0][0], ViewMatrix[1][0], ViewMatrix[2][0]);
 		glUniform3f(CameraUp_worldspace_ID   , ViewMatrix[0][1], ViewMatrix[1][1], ViewMatrix[2][1]);
 
-		glUniformMatrix4fv(ViewProjMatrixID, 1, GL_FALSE, &ViewProjectionMatrix[0][0]);
+		glUniformMatrix4fv(ModelViewProjMatrixID, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 
 		// 1rst attribute buffer : vertices
 		glEnableVertexAttribArray(0);
@@ -409,7 +477,7 @@ int main( void )
 		glDisableVertexAttribArray(0);
 		glDisableVertexAttribArray(1);
 		glDisableVertexAttribArray(2);
-
+		
 		// Swap buffers
 		glfwSwapBuffers(window);
 		glfwPollEvents();
