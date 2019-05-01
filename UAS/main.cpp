@@ -68,8 +68,8 @@ void SortParticles(){
 }
 
 void InitSmokeParticle(int particleIndex){
-	ParticlesContainer[particleIndex].life = 0.25f; // This particle will live 0.25 seconds.
-	ParticlesContainer[particleIndex].pos = glm::vec3(0,0, -5.0f); // Initial particle position
+	ParticlesContainer[particleIndex].life = 0.1f; // This particle will live 0.25 seconds.
+	ParticlesContainer[particleIndex].pos = glm::vec3(-0.6f, -0.4f, -1.0f); // Initial particle position
 
 	float spread = 1.5f;
 	glm::vec3 maindir = glm::vec3(5.0f, 5.0f, -20.0f);
@@ -82,7 +82,7 @@ void InitSmokeParticle(int particleIndex){
 		(rand()%2000 - 1000.0f)/1000.0f
 	);
 	
-	float speedMultiplier = 2.0f;
+	float speedMultiplier = 1.0f;
 	ParticlesContainer[particleIndex].speed = (maindir + randomdir*spread) * speedMultiplier;
 
 
