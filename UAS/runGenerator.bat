@@ -1,1 +1,0 @@
-python CubeGenerator.py input.txt output.txt
