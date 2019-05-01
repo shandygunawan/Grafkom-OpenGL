@@ -200,9 +200,10 @@ int main( void )
 		// Generate 10 new particule each millisecond,
 		// but limit this to 16 ms (60 fps), or if you have 1 long frame (1sec),
 		// newparticles will be huge and the next frame even longer.
-		int newparticles = (int)(delta*10000.0);
-		if (newparticles > (int)(0.016f*10000.0))
-			newparticles = (int)(0.016f*10000.0);
+		double particleCount = 0.2 ; // per millisecond
+		int newparticles = (int)(delta*particleCount*1000.0);
+		if (newparticles > (int)(0.016f*particleCount*1000.0))
+			newparticles = (int)(0.016f*particleCount*1000.0);
 		
 		for(int i=0; i<newparticles; i++){
 			int particleIndex = FindUnusedParticle();
@@ -251,7 +252,7 @@ int main( void )
 					p.speed += glm::vec3(0.0f,-9.81f, 0.0f) * (float)delta * 0.5f;
 					p.pos += p.speed * (float)delta;
 					p.cameradistance = glm::length2( p.pos - CameraPosition );
-					//ParticlesContainer[i].pos += glm::vec3(0.0f,10.0f, 0.0f) * (float)delta;
+					// ParticlesContainer[i].pos += glm::vec3(0.0f,10.0f, 0.0f) * (float)delta;
 
 					// Fill the GPU buffer
 					g_particule_position_size_data[4*ParticlesCount+0] = p.pos.x;
