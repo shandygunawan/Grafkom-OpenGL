@@ -206,17 +206,20 @@ int main( void )
 		
 		for(int i=0; i<newparticles; i++){
 			int particleIndex = FindUnusedParticle();
-			ParticlesContainer[particleIndex].life = 5.0f; // This particle will live 5 seconds.
-			ParticlesContainer[particleIndex].pos = glm::vec3(0,0,-20.0f);
+			ParticlesContainer[particleIndex].life = 10.0f; // This particle will live 5 seconds.
+			// ParticlesContainer[particleIndex].pos = glm::vec3(0,0,-20.0f);
+			ParticlesContainer[particleIndex].pos = glm::vec3(0,10.0f,0.0f);
 
-			float spread = 1.5f;
-			glm::vec3 maindir = glm::vec3(0.0f, 10.0f, 0.0f);
+			float spread = 20.f;
+			// glm::vec3 maindir = glm::vec3(0.0f, 10.0f, 0.0f);
+			glm::vec3 maindir = glm::vec3(0.0f, -10.0f, 0.0f);
+			// glm::vec3 maindir = glm::vec3(0.0f, 0.0f, 10.0f);
 			// Very bad way to generate a random direction; 
 			// See for instance http://stackoverflow.com/questions/5408276/python-uniform-spherical-distribution instead,
 			// combined with some user-controlled parameters (main direction, spread, etc)
 			glm::vec3 randomdir = glm::vec3(
 				(rand()%2000 - 1000.0f)/1000.0f,
-				(rand()%2000 - 1000.0f)/1000.0f,
+				0.0f,
 				(rand()%2000 - 1000.0f)/1000.0f
 			);
 			
@@ -228,9 +231,9 @@ int main( void )
 			// ParticlesContainer[particleIndex].g = rand() % 256;
 			// ParticlesContainer[particleIndex].b = rand() % 256;
 
-			ParticlesContainer[particleIndex].r = 255;
-			ParticlesContainer[particleIndex].g = 255;
-			ParticlesContainer[particleIndex].b = 0;
+			ParticlesContainer[particleIndex].r = 128;
+			ParticlesContainer[particleIndex].g = 206;
+			ParticlesContainer[particleIndex].b = 207;
 
 			ParticlesContainer[particleIndex].a = (rand() % 256) / 3;
 
