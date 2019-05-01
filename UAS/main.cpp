@@ -95,7 +95,7 @@ void InitSmokeParticle(int particleIndex){
 
 void CreateRainParticle(int particleIndex) {
 
-	ParticlesContainer[particleIndex].life = 10.0f; // This particle will live 10 seconds.
+	ParticlesContainer[particleIndex].life = 5.0f; // This particle will live 5 seconds.
 	ParticlesContainer[particleIndex].pos = glm::vec3(0,10.0f,0.0f);
 
 	float spread = 20.f;
@@ -110,7 +110,8 @@ void CreateRainParticle(int particleIndex) {
 		(rand()%2000 - 1000.0f)/1000.0f
 	);
 	
-	ParticlesContainer[particleIndex].speed = maindir + randomdir*spread;
+	float speedMultiplier = 6.0f;
+	ParticlesContainer[particleIndex].speed = (maindir + randomdir*spread) * speedMultiplier;
 
 
 	// Very bad way to generate a random color
@@ -118,9 +119,9 @@ void CreateRainParticle(int particleIndex) {
 	ParticlesContainer[particleIndex].g = 206;
 	ParticlesContainer[particleIndex].b = 207;
 
-	ParticlesContainer[particleIndex].a = (rand() % 256) / 3;
+	ParticlesContainer[particleIndex].a = 128;
 
-	ParticlesContainer[particleIndex].size = (rand()%1000)/2000.0f + 0.1f;
+	ParticlesContainer[particleIndex].size = 0.2f;
 }
 
 int main( void )
